@@ -29,6 +29,6 @@ class IndexHandler(tornado.web.RequestHandler):
 
         self.render('index.html',
                     start_date=start_date,
-                    end_date=end_date
+                    end_date=end_date,
                     )
 

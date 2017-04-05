@@ -22,12 +22,11 @@ class LoginHandler(tornado.web.RequestHandler):
 
 class TableHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
-        # self.set_header('Access-Control-Allow-Origin', '*')
-        # self.set_header('Access-Control-Allow-Methods', '*')
-        # self.set_header('Access-Control-Max-Age', '1000')
-        # self.set_header('Access-Control-Allow-Headers', '*')
-        # self.set_header('Content-type', 'application/String')
-        pass
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'get, post')
+        self.set_header('Access-Control-Max-Age', '1000')
+        self.set_header('Access-Control-Allow-Headers', '*')
+        self.set_header('Content-type', 'application/String')
 
     def post(self):
         table = 2
@@ -50,8 +49,7 @@ class App(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r'/', IndexHandler),
-            (r'/table', TableHandler),
-            (r'/table2', CheckStockIsWrothBuyingHandler),
+            (r'/average_line', CheckStockIsWrothBuyingHandler),
         ]
 
         print(os.path.dirname(__file__))

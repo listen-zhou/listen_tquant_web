@@ -71,9 +71,9 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
                     }
                     list_data.append(item_dict)
                 print(list_data)
-                result = self.render_string('modules/average.html', table=list_data).decode('utf-8')
-                print('result', result)
-                self.write(result)
+                for table in list_data:
+                    result = self.render_string('modules/average.html', table=table).decode('utf-8')
+                    self.write(result)
                 self.finish()
             except Exception:
                 sys.exc_info()

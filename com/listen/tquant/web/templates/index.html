@@ -32,23 +32,6 @@
             });
         });
 
-        function add(){
-            var number = $('#number').val();
-            number = parseInt(number) + 1;
-            $('#number').val(number);
-            var url = "/table2";
-            $.ajax({
-                url: url,
-                type: 'post',
-                data: {'table': number},
-                dataType: 'text',
-                success: function(data){
-                    console.log('data:' + data);
-                    $('#table').append(data);
-                }
-            });
-        }
-
         function duang(){
             var security_code = $('#security_code').val()
             var start_date = $('#start_date').val();
@@ -56,7 +39,7 @@
             console.log(security_code);
             console.log(start_date);
             console.log(end_date);
-            var url = "/table2";
+            var url = "/average_line";
             $.ajax({
                 url: url,
                 type: 'post',
@@ -68,12 +51,12 @@
                 dataType: 'text',
                 success: function(data){
                     console.log('data:' + data);
-                    $('#table').html('')
+                    $('#tbody').html('')
                     if(data != ''){
-                        $('#table').append(data);
+                        $('#tbody').append(data);
                     }
                     else{
-                        $('#table').append('没有数据');
+                        $('#tbody').append('没有数据');
                     }
                 }
             });
@@ -98,7 +81,83 @@
         </div>
         <button class="btn btn-default" onclick="duang()">Duang</button>
 
-        <table class="table table-bordered" id="table"></table>
+        <table class="table table-bordered" id="table">
+            <thead>
+                <tr>
+                  <th>交易日</th>
+                  <th>当日收盘价</th>
+                  <th>当日成交额（元）</th>
+                  <th>当日成交量（元）</th>
+
+                  <th>3日均收盘价</th>
+                  <th>3日均收盘价涨跌幅</th>
+                  <th>3日均收盘价涨跌幅平均值</th>
+
+                  <th>3日均成交额(元)</th>
+                  <th>3日均成交额涨跌幅</th>
+                  <th>3日均成交额涨跌幅平均值</th>
+
+                  <th>3日均成交量(手)</th>
+                  <th>3日均成交量涨跌幅</th>
+                  <th>3日均成交量涨跌幅平均值</th>
+
+                  <th>3日均成交均价</th>
+                  <th>3日均成交均价涨跌幅</th>
+                  <th>3日均成交均价涨跌幅平均值</th>
+
+                  <th>3日金钱流向涨跌幅</th>
+                  <th>3日金钱流向涨跌幅平均值</th>
+
+                  <th>3日成交量流向涨跌幅</th>
+                  <th>3日成交量流向涨跌幅平均值</th>
+
+                  <th>5日均收盘价</th>
+                  <th>5日均收盘价涨跌幅</th>
+                  <th>5日均收盘价涨跌幅平均值</th>
+
+                  <th>5日均成交额(元)</th>
+                  <th>5日均成交额涨跌幅平均值</th>
+                  <th>5日均成交额涨跌幅平均值</th>
+
+                  <th>5日均成交量(手)</th>
+                  <th>5日均成交量涨跌幅</th>
+                  <th>5日均成交量涨跌幅平均值</th>
+
+                  <th>5日均成交均价</th>
+                  <th>5日均成交均价涨跌幅</th>
+                  <th>5日均成交均价涨跌幅平均值</th>
+
+                  <th>5日金钱流向涨跌幅</th>
+                  <th>5日金钱流向涨跌幅平均值</th>
+
+                  <th>5日成交量流向涨跌幅</th>
+                  <th>5日成交量流向涨跌幅平均值</th>
+
+                  <th>10日均收盘价</th>
+                  <th>10日均收盘价涨跌幅</th>
+                  <th>10日均收盘价涨跌幅平均值</th>
+
+                  <th>10日均成交额(元)</th>
+                  <th>10日均成交额涨跌幅平均值</th>
+                  <th>10日均成交额涨跌幅平均值</th>
+
+                  <th>10日均成交量(手)</th>
+                  <th>10日均成交量涨跌幅</th>
+                  <th>10日均成交量涨跌幅平均值</th>
+
+                  <th>10日均成交均价</th>
+                  <th>10日均成交均价涨跌幅</th>
+                  <th>10日均成交均价涨跌幅平均值</th>
+
+                  <th>10日金钱流向涨跌幅</th>
+                  <th>10日金钱流向涨跌幅平均值</th>
+
+                  <th>10日成交量流向涨跌幅</th>
+                  <th>10日成交量流向涨跌幅平均值</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
     </body>
 
 </html>
