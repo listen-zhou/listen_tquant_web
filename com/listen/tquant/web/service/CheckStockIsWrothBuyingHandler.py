@@ -40,45 +40,112 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             sql = self.get_query_sql(security_code, start_date, end_date)
             try:
                 tuple_data = dbService.query(sql)
-                print(tuple_data)
-                list_data = []
                 for item in tuple_data:
-                    item_dict = {
-                        'the_date': item[0].strftime('%Y-%m-%d'),
-                        'close': item[1], 'amount': item[2], 'vol': item[3],
-
-                        'ma3_close_avg': item[4], 'ma3_close_avg_chg': item[5], 'ma3_close_avg_chg_avg': item[6],
-                        'ma3_amount_avg': item[7], 'ma3_amount_avg_chg': item[8], 'ma3_amount_avg_chg_avg': item[9],
-                        'ma3_vol_avg': item[10], 'ma3_vol_avg_chg': item[11], 'ma3_vol_avg_chg_avg': item[12],
-                        'ma3_price_avg': item[13], 'ma3_price_avg_chg': item[14], 'ma3_price_avg_chg_avg': item[15],
-                        'ma3_amount_flow_chg': item[16], 'ma3_amount_flow_chg_avg': item[17],
-                        'ma3_vol_flow_chg': item[18], 'ma3_vol_flow_chg_avg': item[19],
-
-                        'ma5_close_avg': item[20], 'ma5_close_avg_chg': item[21], 'ma5_close_avg_chg_avg': item[22],
-                        'ma5_amount_avg': item[23], 'ma5_amount_avg_chg': item[24], 'ma5_amount_avg_chg_avg': item[25],
-                        'ma5_vol_avg': item[26], 'ma5_vol_avg_chg': item[27], 'ma5_vol_avg_chg_avg': item[28],
-                        'ma5_price_avg': item[29], 'ma5_price_avg_chg': item[30], 'ma5_price_avg_chg_avg': item[31],
-                        'ma5_amount_flow_chg': item[32], 'ma5_amount_flow_chg_avg': item[33],
-                        'ma5_vol_flow_chg': item[34], 'ma5_vol_flow_chg_avg': item[35],
-
-                        'ma10_close_avg': item[36], 'ma10_close_avg_chg': item[37], 'ma10_close_avg_chg_avg': item[38],
-                        'ma10_amount_avg': item[39], 'ma10_amount_avg_chg': item[40], 'ma10_amount_avg_chg_avg': item[41],
-                        'ma10_vol_avg': item[42], 'ma10_vol_avg_chg': item[43], 'ma10_vol_avg_chg_avg': item[44],
-                        'ma10_price_avg': item[45], 'ma10_price_avg_chg': item[46], 'ma10_price_avg_chg_avg': item[47],
-                        'ma10_amount_flow_chg': item[48], 'ma10_amount_flow_chg_avg': item[49],
-                        'ma10_vol_flow_chg': item[50], 'ma10_vol_flow_chg_avg': item[51],
-
-                    }
-                    list_data.append(item_dict)
-                print(list_data)
-                for table in list_data:
-                    result = self.render_string('modules/average.html', table=table).decode('utf-8')
+                    item_list = self.analysis_item(item)
+                    result = self.render_string('modules/average.html', table=item_list).decode('utf-8')
                     self.write(result)
                 self.finish()
             except Exception:
                 sys.exc_info()
         else:
-            self.write('aa')
+            self.write('没有数据')
+
+    def analysis_item(self, item):
+        item_list = [
+            [item[0].strftime('%Y-%m-%d'), ''],
+            [item[1], ''],
+            [item[2], ''],
+            [item[3], ''],
+
+            [item[4], ''],
+            [item[5], self.get_css(item[5])],
+            [item[6], self.get_css(item[6])],
+
+            [item[7], ''],
+            [item[8], self.get_css(item[8])],
+            [item[9], self.get_css(item[9])],
+
+            [item[10], ''],
+            [item[11], self.get_css(item[11])],
+            [item[12], self.get_css(item[12])],
+
+            [item[13], ''],
+            [item[14], self.get_css(item[14])],
+            [item[15], self.get_css(item[15])],
+
+            [item[16], self.get_css(item[16])],
+            [item[17], self.get_css(item[17])],
+
+            [item[18], self.get_css(item[18])],
+            [item[19], self.get_css(item[19])],
+
+            [item[20], ''],
+            [item[21], self.get_css(item[21])],
+            [item[22], self.get_css(item[22])],
+
+            [item[23], ''],
+            [item[24], self.get_css(item[24])],
+            [item[25], self.get_css(item[25])],
+
+            [item[26], ''],
+            [item[27], self.get_css(item[27])],
+            [item[28], self.get_css(item[28])],
+
+            [item[29], ''],
+            [item[30], self.get_css(item[30])],
+            [item[31], self.get_css(item[31])],
+
+            [item[32], self.get_css(item[32])],
+            [item[33], self.get_css(item[33])],
+
+            [item[34], self.get_css(item[34])],
+            [item[35], self.get_css(item[35])],
+
+            [item[36], ''],
+            [item[37], self.get_css(item[37])],
+            [item[38], self.get_css(item[38])],
+
+            [item[39], ''],
+            [item[40], self.get_css(item[40])],
+            [item[41], self.get_css(item[41])],
+
+            [item[42], ''],
+            [item[43], self.get_css(item[43])],
+            [item[44], self.get_css(item[44])],
+
+            [item[45], ''],
+            [item[46], self.get_css(item[46])],
+            [item[47], self.get_css(item[47])],
+
+            [item[48], self.get_css(item[48])],
+            [item[49], self.get_css(item[49])],
+
+            [item[50], self.get_css(item[50])],
+            [item[51], self.get_css(item[51])],
+        ]
+        return item_list
+
+    def get_css(self, val):
+        if val is None:
+            return ''
+        elif val >= 3:
+            return 'm3'
+        elif val >= 2:
+            return 'm2'
+        elif val >= 1:
+            return 'm1'
+        elif val > 0:
+            return 'm0'
+        elif val <= -3:
+            return 'l3'
+        elif val <= -2:
+            return 'l2'
+        elif val <= -1:
+            return 'l1'
+        elif val < 0:
+            return 'l0'
+        else:
+            return ''
 
     def get_query_sql(self, security_code, start_date, end_date):
         sql = "select ma3.the_date, ma3.close, ma3.amount, ma3.vol, " \

@@ -16,35 +16,6 @@ from com.listen.tquant.web.service.StockAverageLineModule import StockAverageLin
 
 define('port', default=8000, help='run on the given port', type=int)
 
-class LoginHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render('login.html', table=5)
-
-class TableHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'get, post')
-        self.set_header('Access-Control-Max-Age', '1000')
-        self.set_header('Access-Control-Allow-Headers', '*')
-        self.set_header('Content-type', 'application/String')
-
-    def post(self):
-        table = 2
-        try:
-            table = self.get_argument('table')
-        except Exception:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print(exc_type, exc_value, exc_traceback)
-        print('table', table)
-        result = self.render_string('modules/table.html', table=table).decode('utf-8')
-        print('result', str(result))
-        self.write(result)
-        self.set_status(200)
-
-class TableModule(tornado.web.UIModule):
-    def render(self, table):
-        return self.render_string('modules/table.html', table=table)
-
 class App(tornado.web.Application):
     def __init__(self):
         handlers = [
