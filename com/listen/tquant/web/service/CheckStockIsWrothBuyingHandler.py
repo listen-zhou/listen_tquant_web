@@ -73,11 +73,11 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             [item[14], self.get_css(item[14])],
             [item[15], self.get_css(item[15])],
 
-            [item[16], self.get_css(item[16])],
-            [item[17], self.get_css(item[17])],
+            [item[16], self.get_flow_css(item[16])],
+            [item[17], self.get_flow_css(item[17])],
 
-            [item[18], self.get_css(item[18])],
-            [item[19], self.get_css(item[19])],
+            [item[18], self.get_flow_css(item[18])],
+            [item[19], self.get_flow_css(item[19])],
 
             [item[20], ''],
             [item[21], self.get_css(item[21])],
@@ -95,11 +95,11 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             [item[30], self.get_css(item[30])],
             [item[31], self.get_css(item[31])],
 
-            [item[32], self.get_css(item[32])],
-            [item[33], self.get_css(item[33])],
+            [item[32], self.get_flow_css(item[32])],
+            [item[33], self.get_flow_css(item[33])],
 
-            [item[34], self.get_css(item[34])],
-            [item[35], self.get_css(item[35])],
+            [item[34], self.get_flow_css(item[34])],
+            [item[35], self.get_flow_css(item[35])],
 
             [item[36], ''],
             [item[37], self.get_css(item[37])],
@@ -117,13 +117,35 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             [item[46], self.get_css(item[46])],
             [item[47], self.get_css(item[47])],
 
-            [item[48], self.get_css(item[48])],
-            [item[49], self.get_css(item[49])],
+            [item[48], self.get_flow_css(item[48])],
+            [item[49], self.get_flow_css(item[49])],
 
-            [item[50], self.get_css(item[50])],
-            [item[51], self.get_css(item[51])],
+            [item[50], self.get_flow_css(item[50])],
+            [item[51], self.get_flow_css(item[51])],
         ]
         return item_list
+
+    def get_flow_css(self, val):
+        if val is None :
+            return ''
+        elif val >= 3:
+            return 'm3'
+        elif val >= 2:
+            return 'm2'
+        elif val >= 1.5:
+            return 'm1'
+        elif val > 1:
+            return 'm0'
+        elif val < 1:
+            return 'l0'
+        elif val <= 0.75:
+            return 'l1'
+        elif val <= 0.5:
+            return 'l2'
+        elif val <= 0.25:
+            return 'l3'
+        else:
+            return ''
 
     def get_css(self, val):
         if val is None:
