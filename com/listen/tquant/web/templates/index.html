@@ -25,8 +25,16 @@
 
     <script src="{{ static_url('js/tquant_utils.js') }}"></script>
     <script type="text/javascript">
+        var ws
         $(function(){
-
+            ws = new WebSocket("ws://localhost:8000/average_line/ws");
+            ws.onmessage = function(e){
+                $("#table").html(e.data);
+            }
+            ws.onopen = function(){
+                ws.send('hello');
+                console.log('redis client hello')
+            }
             $('.date').datetimepicker({
                 format: 'YYYY-MM-DD'
             });
@@ -50,12 +58,12 @@
                 },
                 dataType: 'text',
                 success: function(data){
-                    $('#tbody').html('')
+                    $('#table').html('')
                     if(data != ''){
-                        $('#tbody').append(data);
+                        $('#table').append(data);
                     }
                     else{
-                        $('#tbody').append('没有数据');
+                        $('#table').append('没有数据');
                     }
                 }
             });
@@ -64,35 +72,35 @@
 
     <style type="text/css">
         .m3{
-            background: #ff0000;
-            color: #ffff00;
+            background: #FF0000;
+            color: #FFFF00;
         }
         .m2{
-            background: #ff3300;
-            color: #ffff00;
+            background: #FF3300;
+            color: #FFFF00;
         }
         .m1{
-            background: #ff6600;
-            color: #ffff00;
+            background: #FF6600;
+            color: #FFFF00;
         }
         .m0{
-            color: #ff0000;
+            color: #FF0000;
         }
 
         .l0{
-            color: #00ff00;
+            color: #00FF00;
         }
         .l1{
-            background: #009900;
-            color: #ffff00;
+            background: #00FF66;
+            color: #FFFF00;
         }
         .l2{
-            background: #00cc00;
-            color: #ffff00;
+            background: #00FF33;
+            color: #FFFF00;
         }
         .l3{
-            background: #00ff00;
-            color: #ffff00;
+            background: #00FF00;
+            color: #FFFF00;
         }
         .table{
             font-size: 3px;
@@ -112,84 +120,7 @@
                placeholder="请输入结束时间" value="{{end_date}}">
         <button class="btn btn-default" onclick="duang()">Duang</button>
 
-        <table class="table table-bordered" id="table">
-            <thead>
-                <tr>
-                    <th>交_易_日</th>
-                    <th>收</th>
-                    <th>钱</th>
-                    <th>量</th>
-
-                    <th>ma3收均</th>
-                    <th>ma3收均幅</th>
-                    <th>ma3收均幅均</th>
-
-                    <th>ma3日均钱</th>
-                    <th>ma3日均钱幅</th>
-                    <th>ma3日均钱幅均</th>
-
-                    <th>ma3日均量</th>
-                    <th>ma3日均量幅</th>
-                    <th>ma3日均量幅均</th>
-
-                    <th>ma3价均</th>
-                    <th>ma3价均幅</th>
-                    <th>ma3价均幅均</th>
-
-                    <th>ma3钱留幅</th>
-                    <th>ma3钱留幅均</th>
-
-                    <th>ma3量留幅</th>
-                    <th>ma3量留幅均</th>
-
-                    <th>ma5收均</th>
-                    <th>ma5收均幅</th>
-                    <th>ma5收均幅均</th>
-
-                    <th>ma5日均钱</th>
-                    <th>ma5日均钱幅</th>
-                    <th>ma5日均钱幅均</th>
-
-                    <th>ma5日均量</th>
-                    <th>ma5日均量幅</th>
-                    <th>ma5日均量幅均</th>
-
-                    <th>ma5价均</th>
-                    <th>ma5价均幅</th>
-                    <th>ma5价均幅均</th>
-
-                    <th>ma5钱留幅</th>
-                    <th>ma5钱留幅均</th>
-
-                    <th>ma5量留幅</th>
-                    <th>ma5量留幅均</th>
-
-                    <th>ma10收均</th>
-                    <th>ma10收均幅</th>
-                    <th>ma10收均幅均</th>
-
-                    <th>ma10日均钱</th>
-                    <th>ma10日均钱幅</th>
-                    <th>ma10日均钱幅均</th>
-
-                    <th>ma10日均量</th>
-                    <th>ma10日均量幅</th>
-                    <th>ma10日均量幅均</th>
-
-                    <th>ma10价均</th>
-                    <th>ma10价均幅</th>
-                    <th>ma10价均幅均</th>
-
-                    <th>ma10钱留幅</th>
-                    <th>ma10钱留幅均</th>
-
-                    <th>ma10量留幅</th>
-                    <th>ma10量留幅均</th>
-
-                </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-        </table>
+        <table class="table table-bordered" id="table"></table>
     </body>
 
 </html>

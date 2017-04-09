@@ -1,0 +1,17 @@
+<thead>
+    <tr>
+        {% for i in indexes %}
+        <td>{{ thead_dict[i] }}</td>
+        {% end %}
+    </tr>
+</thead>
+<tbody id="tbody">
+    {% for item_list in table %}
+      <tr>
+          {% for item in item_list %}
+            <td class="{{ item[1] }}">{{ item[0] }}</td>
+          {% end %}
+      </tr>
+    {% end %}
+</tbody>
+

@@ -40,112 +40,145 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             sql = self.get_query_sql(security_code, start_date, end_date)
             try:
                 tuple_data = dbService.query(sql)
+                list_data = []
+                indexes = [0, 1, 2, 3,
+                           13, 14, 15,
+                           29, 30, 31,
+                           36, 37, 38,
+                           39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49
+                           ]
                 for item in tuple_data:
-                    item_list = self.analysis_item(item)
-                    result = self.render_string('modules/average.html', table=item_list).decode('utf-8')
-                    self.write(result)
-                self.finish()
+                    item_list = self.analysis_item(item, indexes)
+                    list_data.append(item_list)
+                self.render('modules/average_list.html', table=list_data, indexes=indexes, thead_dict=self.get_table_thead_dict())
             except Exception:
                 sys.exc_info()
         else:
             self.write('没有数据')
 
-    def analysis_item(self, item):
-        item_list = [
-            [item[0].strftime('%Y-%m-%d'), ''],
-            [item[1], ''],
-            [item[2], ''],
-            [item[3], ''],
+    @staticmethod
+    def get_table_thead_dict():
+        thead_dict = {}
+        thead_dict[0] = '交易日'
+        thead_dict[1] = '收'
+        thead_dict[2] = '钱'
+        thead_dict[3] = '量'
 
-            [item[4], ''],
-            [item[5], self.get_css(item[5])],
-            [item[6], self.get_css(item[6])],
+        thead_dict[4] = 'ma3收均'
+        thead_dict[5] = 'ma3收均幅'
+        thead_dict[6] = 'ma3收均幅均'
 
-            [item[7], ''],
-            [item[8], self.get_css(item[8])],
-            [item[9], self.get_css(item[9])],
+        thead_dict[7] = 'ma3日均钱'
+        thead_dict[8] = 'ma3日均钱幅'
+        thead_dict[9] = 'ma3日均钱幅均'
 
-            [item[10], ''],
-            [item[11], self.get_css(item[11])],
-            [item[12], self.get_css(item[12])],
+        thead_dict[10] = 'ma3日均量'
+        thead_dict[11] = 'ma3日均量幅'
+        thead_dict[12] = 'ma3日均量幅均'
 
-            [item[13], ''],
-            [item[14], self.get_css(item[14])],
-            [item[15], self.get_css(item[15])],
+        thead_dict[13] = 'ma3价均'
+        thead_dict[14] = 'ma3价均幅'
+        thead_dict[15] = 'ma3价均幅均'
 
-            [item[16], self.get_flow_css(item[16])],
-            [item[17], self.get_flow_css(item[17])],
+        thead_dict[16] = 'ma3钱留幅'
+        thead_dict[17] = 'ma3钱留幅均'
 
-            [item[18], self.get_flow_css(item[18])],
-            [item[19], self.get_flow_css(item[19])],
+        thead_dict[18] = 'ma3量留幅'
+        thead_dict[19] = 'ma3量留幅均'
 
-            [item[20], ''],
-            [item[21], self.get_css(item[21])],
-            [item[22], self.get_css(item[22])],
+        thead_dict[20] = 'ma5收均'
+        thead_dict[21] = 'ma5收均幅'
+        thead_dict[22] = 'ma5收均幅均'
 
-            [item[23], ''],
-            [item[24], self.get_css(item[24])],
-            [item[25], self.get_css(item[25])],
+        thead_dict[23] = 'ma5日均钱'
+        thead_dict[24] = 'ma5日均钱幅'
+        thead_dict[25] = 'ma5日均钱幅均'
 
-            [item[26], ''],
-            [item[27], self.get_css(item[27])],
-            [item[28], self.get_css(item[28])],
+        thead_dict[26] = 'ma5日均量'
+        thead_dict[27] = 'ma5日均量幅'
+        thead_dict[28] = 'ma5日均量幅均'
 
-            [item[29], ''],
-            [item[30], self.get_css(item[30])],
-            [item[31], self.get_css(item[31])],
+        thead_dict[29] = 'ma5价均'
+        thead_dict[30] = 'ma5价均幅'
+        thead_dict[31] = 'ma5价均幅均'
 
-            [item[32], self.get_flow_css(item[32])],
-            [item[33], self.get_flow_css(item[33])],
+        thead_dict[32] = 'ma5钱留幅'
+        thead_dict[33] = 'ma5钱留幅均'
 
-            [item[34], self.get_flow_css(item[34])],
-            [item[35], self.get_flow_css(item[35])],
+        thead_dict[34] = 'ma5量留幅'
+        thead_dict[35] = 'ma5量留幅均'
 
-            [item[36], ''],
-            [item[37], self.get_css(item[37])],
-            [item[38], self.get_css(item[38])],
+        thead_dict[36] = 'ma10收均'
+        thead_dict[37] = 'ma10收均幅'
+        thead_dict[38] = 'ma10收均幅均'
 
-            [item[39], ''],
-            [item[40], self.get_css(item[40])],
-            [item[41], self.get_css(item[41])],
+        thead_dict[39] = 'ma10日均钱'
+        thead_dict[40] = 'ma10日均钱幅'
+        thead_dict[41] = 'ma10日均钱幅均'
 
-            [item[42], ''],
-            [item[43], self.get_css(item[43])],
-            [item[44], self.get_css(item[44])],
+        thead_dict[42] = 'ma10日均量'
+        thead_dict[43] = 'ma10日均量幅'
+        thead_dict[44] = 'ma10日均量幅均'
 
-            [item[45], ''],
-            [item[46], self.get_css(item[46])],
-            [item[47], self.get_css(item[47])],
+        thead_dict[45] = 'ma10价均'
+        thead_dict[46] = 'ma10价均幅'
+        thead_dict[47] = 'ma10价均幅均'
 
-            [item[48], self.get_flow_css(item[48])],
-            [item[49], self.get_flow_css(item[49])],
+        thead_dict[48] = 'ma10钱留幅'
+        thead_dict[49] = 'ma10钱留幅均'
 
-            [item[50], self.get_flow_css(item[50])],
-            [item[51], self.get_flow_css(item[51])],
-        ]
+        thead_dict[50] = 'ma10量留幅'
+        thead_dict[51] = 'ma10量留幅均'
+
+        return thead_dict
+
+    def get_table_thead_fields(self, indexes):
+        thead_fields = []
+        thead_dice = CheckStockIsWrothBuyingHandler.get_table_thead_dict()
+        for i in indexes:
+            thead_fields.append(thead_dice[i])
+        return thead_fields
+
+
+    def analysis_item(self, item, indexes):
+        item_list = []
+        for i in indexes:
+            if i == 0:
+                item_list.append([item[i].strftime('%m%d'), ''])
+            elif i >= 1 and i <= 3:
+                item_list.append([item[i], ''])
+            elif (i >= 16 and i <= 19) or (i >= 32 and i <= 35) or (i >= 48 and i <= 51):
+                item_list.append([item[i], self.get_css(item[i])])
+            elif i == 4 or i == 7 or i == 10 or i == 13 \
+                    or i == 20 or i == 23 or i == 26 or i == 29 \
+                    or i == 36 or i == 39 or i == 42 or i == 45:
+                item_list.append([item[i], ''])
+            else:
+                item_list.append([item[i], self.get_css(item[i])])
+
         return item_list
 
-    def get_flow_css(self, val):
-        if val is None :
-            return ''
-        elif val >= 3:
-            return 'm3'
-        elif val >= 2:
-            return 'm2'
-        elif val >= 1.5:
-            return 'm1'
-        elif val > 1:
-            return 'm0'
-        elif val < 1:
-            return 'l0'
-        elif val <= 0.75:
-            return 'l1'
-        elif val <= 0.5:
-            return 'l2'
-        elif val <= 0.25:
-            return 'l3'
-        else:
-            return ''
+    # def get_flow_css(self, val):
+    #     if val is None :
+    #         return ''
+    #     elif val >= 3:
+    #         return 'm3'
+    #     elif val >= 2:
+    #         return 'm2'
+    #     elif val >= 1.5:
+    #         return 'm1'
+    #     elif val > 1:
+    #         return 'm0'
+    #     elif val < 1:
+    #         return 'l0'
+    #     elif val <= 0.75:
+    #         return 'l1'
+    #     elif val <= 0.5:
+    #         return 'l2'
+    #     elif val <= 0.25:
+    #         return 'l3'
+    #     else:
+    #         return ''
 
     def get_css(self, val):
         if val is None:

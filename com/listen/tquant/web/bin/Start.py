@@ -13,6 +13,7 @@ from tornado.options import define, options
 from com.listen.tquant.web.service.CheckStockIsWrothBuyingHandler import CheckStockIsWrothBuyingHandler
 from com.listen.tquant.web.service.IndexHandler import IndexHandler
 from com.listen.tquant.web.service.StockAverageLineModule import StockAverageLineModule
+from com.listen.tquant.web.service.WebSocketHandler import WebSocketHandler
 
 define('port', default=8000, help='run on the given port', type=int)
 
@@ -21,6 +22,7 @@ class App(tornado.web.Application):
         handlers = [
             (r'/', IndexHandler),
             (r'/average_line', CheckStockIsWrothBuyingHandler),
+            (r'/average_line/ws', WebSocketHandler)
         ]
 
         print(os.path.dirname(__file__))
