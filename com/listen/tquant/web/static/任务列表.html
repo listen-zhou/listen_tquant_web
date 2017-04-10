@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://stats.touker.com/dbm/tasks.jsp -->
+<html lang="us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>任务列表</title>
+
+
+<link rel="icon" href="http://stats.touker.com/dbm/img/dm.ico">
+<script type="text/javascript" src="./任务列表_files/jquery.js"></script>
+<script type="text/javascript" src="./任务列表_files/bootstrap.min.js"></script>
+<link href="./任务列表_files/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="./任务列表_files/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+<link href="./任务列表_files/common.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="./任务列表_files/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="./任务列表_files/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="./任务列表_files/jquery.lettering-0.6.1.min.js"></script>
+<script type="text/javascript" src="./任务列表_files/jquery.textillate.js"></script>
+<script type="text/javascript" src="./任务列表_files/tasks.js"></script>
+<link href="./任务列表_files/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css">
+<link href="./任务列表_files/animate.css" rel="stylesheet" type="text/css">
+<link href="./任务列表_files/tasks.css" rel="stylesheet" type="text/css">
+</head>
+<body class="modal-open">
+	
+<div class="modal fade verticalAlignSm" id="msg-dialog" tabindex="-1" role="dialog" aria-labelledby="msgLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h4 class="modal-title text-default" id="msgLabel"></h4>
+			</div>
+			<div class="modal-body text-default"></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->
+	
+<nav class="navbar navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="http://stats.touker.com/dbm/home.do">首页 </a></li>
+				
+				<li class="dropdown"><a href="http://stats.touker.com/dbm/tasks.jsp#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">资料 <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a id="modPassBtn" style="cursor: pointer;">修改密码</a></li>
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+		<!-- /.navbar-header -->
+	</div>
+	<!-- /.container-fluid -->
+</nav>
+
+<div class="modal fade" id="modPass" tabindex="-1" role="dialog" aria-labelledby="modPassLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" style="width: 300px;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h4 class="modal-title" id="modPassLabel">修改密码</h4>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="form-group">
+						<p class="mod-pass-msg label label-danger"></p>
+					</div>
+					<div class="form-group">
+						<label for="task-desc">旧密码<font color="red">(必填)</font>:
+						</label> <input type="password" class="form-control" id="oldPass" placeholder="请输入密码">
+					</div>
+					<div class="form-group">
+						<label for="task-desc">新密码<font color="red">(必填)</font>:
+						</label> <input type="password" class="form-control" id="newPass" placeholder="请输入密码">
+					</div>
+					<div class="form-group">
+						<label for="task-desc">确认密码<font color="red">(必填)</font>:
+						</label> <input type="password" class="form-control" id="confirmPass" placeholder="请输入密码">
+					</div>
+					<div class="form-group">
+						<button type="button" class="btn btn-primary btn-mod-password">提交更改</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$('#modPassBtn').click(function() {
+			$('#modPass').modal({
+				backdrop : 'static'
+			});
+		});
+
+		$('.btn-mod-password').click(function(){
+			$.post('modifyPwd.do', {
+				oldPass : $('#oldPass').val(),
+				newPass : $('#newPass').val(),
+				confirmPass : $('#confirmPass').val()
+			}, function(data){
+				if (data) {
+					if (data.ok) {
+						$('#modPass').modal('hide');
+						$('#msg-dialog .modal-title').text('信息');
+						$('#msg-dialog .modal-body').empty().text('修改成功.');
+						$('#msg-dialog').modal('show');
+						setInterval("$('#msg-dialog').modal('hide');", 1500);
+					} else if (data.error) {
+						$('.mod-pass-msg').text(data.error);
+					}
+				}
+			})
+		});
+	});
+</script>
+
+
+	<div class="container">
+		<h2>
+			<strong>任务管理</strong>
+		</h2>
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading"><span class="label label-primary">任务列表</span></div>
+			<div class="panel-body">
+				<p class="msg label label-danger"></p>
+				<div class="row">
+					<div class="checkbox dispFlg col-md-9">
+						<label><input type="checkbox" style="cursor: pointer;"><span class="label label-default">最近</span></label>
+						<label class="newsLabel" style="display: none;"><a style="font-weight: bold;color: #777;"><span class="newsText"><span style="visibility: visible;"><span class="word1" style="display: inline-block; transform: translate3d(0px, 0px, 0px);"><span class="char1 animated swing" style="display: inline-block; visibility: visible;">新</span><span class="char2 animated swing" style="display: inline-block; visibility: visible;">消</span><span class="char3 animated swing" style="display: inline-block; visibility: visible;">息</span></span> </span><ul class="texts" style="display: none;"><li class="current">新消息</li></ul></span><span class="badge"></span></a></label>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group has-feedback input-group-sm">
+							<input class="form-control searchBox" placeholder="通过任务描述查询" style="margin-top: 8px;"> <span style="color: #777; line-height: 28px;" class="glyphicon glyphicon-search form-control-feedback" aria-hidden="true"></span>
+						</div>
+					</div>
+				</div>
+				<!-- Table -->
+				<div class="tasklist"><p>没有任务</p></div>
+				<nav class="pagenav"></nav>
+			</div>
+			<div class="panel-footer">
+				<div>
+					<h5><span class="label label-info">工具栏</span></h5>
+				</div>
+				<div class="btn-group btn-group-justified" role="group" aria-label="tools">
+					<a href="http://stats.touker.com/dbm/databases.jsp" class="btn btn-default" role="button">查询</a>
+					<div class="btn-group dropup btn-create-task" role="group" style="">
+						<a class="btn btn-default dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> 创建任务 <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" style="overflow-y: auto;max-height: 200px;"><li color="blue"><a data-ruleid="24" data-stepcnt="2">金融数据fddb删表(人工审核)</a></li><li color="blue"><a data-ruleid="22" data-stepcnt="1">金融数据fddb建表(机器审核)</a></li><li color="blue"><a data-ruleid="23" data-stepcnt="2">金融数据fddb改表(人工审核)</a></li><li color="blue"><a data-ruleid="21" data-stepcnt="1">金融数据fddb改表追加(机器审核)</a></li><li role="separator" class="divider"></li><li color="blue"><a data-ruleid="28" data-stepcnt="2">金融数据fndb删表(人工审核)</a></li><li color="blue"><a data-ruleid="26" data-stepcnt="1">金融数据fndb建表(机器审核)</a></li><li color="blue"><a data-ruleid="27" data-stepcnt="2">金融数据fndb改表(人工审核)</a></li><li color="blue"><a data-ruleid="25" data-stepcnt="1">金融数据fndb改表追加(机器审核)</a></li><li role="separator" class="divider"></li><li color="blue"><a data-ruleid="32" data-stepcnt="2">金融数据fsdb删表(人工审核)</a></li><li color="blue"><a data-ruleid="30" data-stepcnt="1">金融数据fsdb建表(机器审核)</a></li><li color="blue"><a data-ruleid="31" data-stepcnt="2">金融数据fsdb改表(人工审核)</a></li><li color="blue"><a data-ruleid="29" data-stepcnt="1">金融数据fsdb改表追加(机器审核)</a></li><li role="separator" class="divider"></li><li color="blue"><a data-ruleid="36" data-stepcnt="2">金融数据fbdb删表(人工审核)</a></li><li color="blue"><a data-ruleid="34" data-stepcnt="1">金融数据fbdb建表(机器审核)</a></li><li color="blue"><a data-ruleid="35" data-stepcnt="2">金融数据fbdb改表(人工审核)</a></li><li color="blue"><a data-ruleid="33" data-stepcnt="1">金融数据fbdb改表追加(机器审核)</a></li><li role="separator" class="divider"></li><li color="blue"><a data-ruleid="40" data-stepcnt="2">金融数据fpdb删表(人工审核)</a></li><li color="blue"><a data-ruleid="38" data-stepcnt="1">金融数据fpdb建表(机器审核)</a></li><li color="blue"><a data-ruleid="39" data-stepcnt="2">金融数据fpdb改表(人工审核)</a></li><li color="blue"><a data-ruleid="37" data-stepcnt="1">金融数据fpdb改表追加(机器审核)</a></li></ul>
+					</div>
+					<a href="http://stats.touker.com/dbm/home.do" class="btn btn-default" role="button">返回</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /container -->
+
+	<div class="modal fade verticalAlignSm" id="confirm-task-dialog" tabindex="-1" role="dialog" aria-labelledby="confirmTaskLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="confirmTaskLabel">确认</h4>
+				</div>
+				<div class="modal-body">是否确认该任务</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary btn-confirm">提交</button>
+					<button type="button" class="btn btn-primary btn-confirm-cancel">驳回</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+	</div>
+	<!-- /.modal -->
+
+	<div class="modal fade in" id="wait" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+		<img style="position: fixed;left: 49%;top: 49%;width:30px;z-index: -1;" src="./任务列表_files/wait.gif">
+	</div>
+
+	<div class="modal fade verticalAlignLg in" id="create-task-dialog" tabindex="-1" role="dialog" aria-labelledby="createTaskLabel" aria-hidden="true" style="margin-top: 107.25px; display: block;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="createTaskLabel">金融数据fddb改表(人工审核)</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<p class="create-task-msg label label-danger"></p>
+						</div>
+						<div class="form-group">
+							<label for="task-desc">任务描述<font color="red">(必填)</font>:</label> <input type="text" class="form-control" id="task-desc" placeholder="请输入任务的描述信息">
+						</div>
+						<div class="form-group">
+							<label for="exec-cmd">执行语句<font color="red">(必填)</font>:</label>
+							<textarea id="exec-cmd" class="form-control exec-cmd" style="resize: none" placeholder="请输入需要执行的语句"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="exec-dt" class="control-label">执行时间(可选，若不填，则通过审批后即刻执行):</label>
+							<div class="input-group date form_datetime" style="width: 250px" data-link-field="exec-dt">
+								<input class="form-control" size="10" type="text" value="" readonly="" id="exec-dt">
+								<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+							</div>
+							<!-- <input type="hidden" id="exec-dt" value="" /> --><br>
+						</div>
+						<div class="form-group">
+							<button type="button" class="btn btn-primary btn-confirm-task">提交更改</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+	</div>
+
+	<div class="modal fade verticalAlignSm" id="info-dialog" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title" id="infoLabel">执行语句信息</h4>
+				</div>
+				<div class="modal-body" style="margin-bottom: 10px;"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary btn-create-task-reconfirm">提交更改</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+	</div>
+
+
+<div class="datetimepicker datetimepicker-dropdown-bottom-right dropdown-menu" style="left: 0px; z-index: 1060;"><div class="datetimepicker-minutes" style="display: none;"><table class=" table-condensed"><thead><tr><th class="prev" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-left"></span> </th><th colspan="5" class="switch">10 四月 2017</th><th class="next" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-right"></span> </th></tr></thead><tbody><tr><td colspan="7"><fieldset class="minute"><legend>下午</legend><span class="minute">6:00</span><span class="minute">6:05</span><span class="minute">6:10</span><span class="minute">6:15</span><span class="minute">6:20</span><span class="minute">6:25</span><span class="minute">6:30</span><span class="minute">6:35</span><span class="minute active">6:40</span><span class="minute">6:45</span><span class="minute">6:50</span><span class="minute">6:55</span></fieldset></td></tr></tbody><tfoot><tr><th colspan="7" class="today">今天</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datetimepicker-hours" style="display: none;"><table class=" table-condensed"><thead><tr><th class="prev" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-left"></span> </th><th colspan="5" class="switch">10 四月 2017</th><th class="next" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-right"></span> </th></tr></thead><tbody><tr><td colspan="7"><fieldset class="hour"><legend>上午</legend><span class="hour hour_am">12</span><span class="hour hour_am">1</span><span class="hour hour_am">2</span><span class="hour hour_am">3</span><span class="hour hour_am">4</span><span class="hour hour_am">5</span><span class="hour hour_am">6</span><span class="hour hour_am">7</span><span class="hour hour_am">8</span><span class="hour hour_am">9</span><span class="hour hour_am">10</span><span class="hour hour_am">11</span></fieldset><fieldset class="hour"><legend>下午</legend><span class="hour hour_pm">12</span><span class="hour hour_pm">1</span><span class="hour hour_pm">2</span><span class="hour hour_pm">3</span><span class="hour hour_pm">4</span><span class="hour hour_pm">5</span><span class="hour active hour_pm">6</span><span class="hour hour_pm">7</span><span class="hour hour_pm">8</span><span class="hour hour_pm">9</span><span class="hour hour_pm">10</span><span class="hour hour_pm">11</span></fieldset></td></tr></tbody><tfoot><tr><th colspan="7" class="today">今天</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datetimepicker-days" style="display: block;"><table class=" table-condensed"><thead><tr><th class="prev" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-left"></span> </th><th colspan="5" class="switch">四月 2017</th><th class="next" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-right"></span> </th></tr><tr><th class="dow">一</th><th class="dow">二</th><th class="dow">三</th><th class="dow">四</th><th class="dow">五</th><th class="dow">六</th><th class="dow">日</th></tr></thead><tbody><tr><td class="day old">27</td><td class="day old">28</td><td class="day old">29</td><td class="day old">30</td><td class="day old">31</td><td class="day">1</td><td class="day">2</td></tr><tr><td class="day">3</td><td class="day">4</td><td class="day">5</td><td class="day">6</td><td class="day">7</td><td class="day">8</td><td class="day">9</td></tr><tr><td class="day today active">10</td><td class="day">11</td><td class="day">12</td><td class="day">13</td><td class="day">14</td><td class="day">15</td><td class="day">16</td></tr><tr><td class="day">17</td><td class="day">18</td><td class="day">19</td><td class="day">20</td><td class="day">21</td><td class="day">22</td><td class="day">23</td></tr><tr><td class="day">24</td><td class="day">25</td><td class="day">26</td><td class="day">27</td><td class="day">28</td><td class="day">29</td><td class="day">30</td></tr><tr><td class="day new">1</td><td class="day new">2</td><td class="day new">3</td><td class="day new">4</td><td class="day new">5</td><td class="day new">6</td><td class="day new">7</td></tr></tbody><tfoot><tr><th colspan="7" class="today">今天</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datetimepicker-months" style="display: none;"><table class="table-condensed"><thead><tr><th class="prev" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-left"></span> </th><th colspan="5" class="switch">2017</th><th class="next" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-right"></span> </th></tr></thead><tbody><tr><td colspan="7"><span class="month">一月</span><span class="month">二月</span><span class="month">三月</span><span class="month active">四月</span><span class="month">五月</span><span class="month">六月</span><span class="month">七月</span><span class="month">八月</span><span class="month">九月</span><span class="month">十月</span><span class="month">十一月</span><span class="month">十二月</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today">今天</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div><div class="datetimepicker-years" style="display: none;"><table class="table-condensed"><thead><tr><th class="prev" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-left"></span> </th><th colspan="5" class="switch">2010-2019</th><th class="next" style="visibility: visible;"><span class="glyphicon glyphicon-arrow-right"></span> </th></tr></thead><tbody><tr><td colspan="7"><span class="year old">2009</span><span class="year">2010</span><span class="year">2011</span><span class="year">2012</span><span class="year">2013</span><span class="year">2014</span><span class="year">2015</span><span class="year">2016</span><span class="year active">2017</span><span class="year">2018</span><span class="year">2019</span><span class="year old">2020</span></td></tr></tbody><tfoot><tr><th colspan="7" class="today">今天</th></tr><tr><th colspan="7" class="clear" style="display: none;">Clear</th></tr></tfoot></table></div></div><div class="modal-backdrop fade in"></div></body></html>
