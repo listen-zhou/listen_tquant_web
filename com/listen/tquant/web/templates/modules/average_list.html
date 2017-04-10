@@ -1,17 +1,24 @@
-<thead>
+<div style="color:red">
+    <label data-file-width="200px">更新时间{{ update_date }}</label>
+    <label>{{ security_info[0] }}</label>
+    <label>{{ security_info[1] }}</label>
+</div>
+<table class="table table-bordered">
+    <thead>
     <tr>
         {% for i in indexes %}
         <td>{{ thead_dict[i] }}</td>
         {% end %}
     </tr>
-</thead>
-<tbody id="tbody">
+    </thead>
+    <tbody id="tbody">
     {% for item_list in table %}
-      <tr>
-          {% for item in item_list %}
-            <td class="{{ item[1] }}">{{ item[0] }}</td>
-          {% end %}
-      </tr>
+    <tr>
+        {% for item in item_list %}
+        <td class="{{ item[1] }}">{{ item[0] }}</td>
+        {% end %}
+    </tr>
     {% end %}
-</tbody>
+    </tbody>
+</table>
 

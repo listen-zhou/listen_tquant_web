@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import os.path
+
+import datetime
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -14,9 +16,54 @@ from com.listen.tquant.web.dbservice.Service import DbService
 
 
 class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
+    dbService = DbService()
+
+    @staticmethod
+    def get_security_info(security_code):
+        sql = "select security_code, security_name " \
+              "from tquant_security_info where security_code = {security_code}"
+        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
+        tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
+        if tuple_data is not None and len(tuple_data) > 0:
+            return tuple_data[0]
+        return None
+
+    @staticmethod
+    def get_indexes():
+        indexes = [0, 1, 2, 3,
+                   13, 14, 15,
+                   29, 30, 31,
+                   36, 37, 38,
+                   39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49
+                   ]
+        return indexes
+
+    @staticmethod
+    def get_list_data(security_code, start_date, end_date, indexes):
+        if start_date is None or len(start_date) == 0:
+            sql = "select the_date from tquant_calendar_info order by the_date desc limit 20 "
+            tuple_the_date = CheckStockIsWrothBuyingHandler.dbService.query(sql)
+            if tuple_the_date is not None and len(tuple_the_date) > 0:
+                start_date = tuple_the_date[len(tuple_the_date) - 1][0].strftime('%Y-%m-%d')
+                end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+        if security_code is not None and len(security_code) > 0:
+            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code, start_date, end_date)
+            try:
+                tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
+                list_data = []
+                for item in tuple_data:
+                    item_list = CheckStockIsWrothBuyingHandler.analysis_item(item, indexes)
+                    list_data.append(item_list)
+                return list_data
+            except Exception:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                print(exc_type, exc_value, exc_traceback)
+            return None
+        else:
+            return None
 
     def post(self):
-        dbService = DbService()
         # method_log_list = self.deepcopy_list(self.log_list)
         security_code = ''
         start_date = ''
@@ -29,32 +76,15 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print(exc_type, exc_value, exc_traceback)
 
-        if start_date is None or len(start_date) == 0:
-            sql = "select the_date from tquant_calendar_info order by the_date desc limit 20 "
-            tuple_the_date = dbService.query(sql)
-            if tuple_the_date is not None and len(tuple_the_date) > 0:
-                start_date = tuple_the_date[len(tuple_the_date) - 1][0].strftime('%Y-%m-%d')
-                end_date = tuple_the_date[0][0].strftime('%Y-%m-%d')
-
-        if security_code is not None and len(security_code) > 0:
-            sql = self.get_query_sql(security_code, start_date, end_date)
-            try:
-                tuple_data = dbService.query(sql)
-                list_data = []
-                indexes = [0, 1, 2, 3,
-                           13, 14, 15,
-                           29, 30, 31,
-                           36, 37, 38,
-                           39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49
-                           ]
-                for item in tuple_data:
-                    item_list = self.analysis_item(item, indexes)
-                    list_data.append(item_list)
-                self.render('modules/average_list.html', table=list_data, indexes=indexes, thead_dict=self.get_table_thead_dict())
-            except Exception:
-                sys.exc_info()
+        security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
+        indexes = CheckStockIsWrothBuyingHandler.get_indexes()
+        table_thead_dict = CheckStockIsWrothBuyingHandler.get_table_thead_dict()
+        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, start_date, end_date, indexes)
+        if list_data is not None and len(list_data) > 0:
+                self.render('modules/average_list.html', table=list_data, indexes=indexes, thead_dict=table_thead_dict, update_date=datetime.datetime.now(), security_info=security_info)
         else:
             self.write('没有数据')
+
 
     @staticmethod
     def get_table_thead_dict():
@@ -132,15 +162,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
 
         return thead_dict
 
-    def get_table_thead_fields(self, indexes):
-        thead_fields = []
-        thead_dice = CheckStockIsWrothBuyingHandler.get_table_thead_dict()
-        for i in indexes:
-            thead_fields.append(thead_dice[i])
-        return thead_fields
-
-
-    def analysis_item(self, item, indexes):
+    @staticmethod
+    def analysis_item(item, indexes):
         item_list = []
         for i in indexes:
             if i == 0:
@@ -148,13 +171,13 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             elif i >= 1 and i <= 3:
                 item_list.append([item[i], ''])
             elif (i >= 16 and i <= 19) or (i >= 32 and i <= 35) or (i >= 48 and i <= 51):
-                item_list.append([item[i], self.get_css(item[i])])
+                item_list.append([item[i], CheckStockIsWrothBuyingHandler.get_css(item[i])])
             elif i == 4 or i == 7 or i == 10 or i == 13 \
                     or i == 20 or i == 23 or i == 26 or i == 29 \
                     or i == 36 or i == 39 or i == 42 or i == 45:
                 item_list.append([item[i], ''])
             else:
-                item_list.append([item[i], self.get_css(item[i])])
+                item_list.append([item[i], CheckStockIsWrothBuyingHandler.get_css(item[i])])
 
         return item_list
 
@@ -180,7 +203,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
     #     else:
     #         return ''
 
-    def get_css(self, val):
+    @staticmethod
+    def get_css(val):
         if val is None:
             return ''
         elif val >= 3:
@@ -202,7 +226,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         else:
             return ''
 
-    def get_query_sql(self, security_code, start_date, end_date):
+    @staticmethod
+    def get_query_sql(security_code, start_date, end_date):
         sql = "select ma3.the_date, ma3.close, ma3.amount, ma3.vol, " \
               "ma3.close_avg ma3_close_avg, ma3.close_avg_chg ma3_close_avg_chg, ma3.close_avg_chg_avg ma3_close_avg_chg_avg, " \
               "ma3.amount_avg ma3_amount_avg, ma3.amount_avg_chg ma3_amount_avg_chg, ma3.amount_avg_chg_avg ma3_amount_avg_chg_avg, " \
@@ -239,13 +264,14 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "where ma = 10 and security_code = {security_code} and the_date >= {start_date} and the_date <= {end_date}" \
               ") ma10 on ma3.the_date = ma10.the_date " \
               "order by ma3.the_date desc "
-        sql = sql.format(security_code=self.quotes_surround(security_code),
-                         start_date=self.quotes_surround(start_date),
-                         end_date=self.quotes_surround(end_date)
+        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code),
+                         start_date=CheckStockIsWrothBuyingHandler.quotes_surround(start_date),
+                         end_date=CheckStockIsWrothBuyingHandler.quotes_surround(end_date)
                          )
         return sql
 
-    def quotes_surround(self, str):
+    @staticmethod
+    def quotes_surround(str):
         if str is not None:
             return "'" + str + "'"
         return str
