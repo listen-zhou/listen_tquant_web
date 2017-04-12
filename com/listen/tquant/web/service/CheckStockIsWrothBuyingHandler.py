@@ -20,6 +20,7 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
 
     @staticmethod
     def get_security_info(security_code):
+        print('get_security_info', security_code)
         sql = "select security_code, security_name " \
               "from tquant_security_info where security_code = {security_code}"
         sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
@@ -29,32 +30,18 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         return None
 
     @staticmethod
-    def get_indexes():
-        indexes = [0, 1, 2, 3,
-                   13, 14, 15,
-                   29, 30, 31,
-                   36, 37, 38,
-                   39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49
-                   ]
-        return indexes
-
-    @staticmethod
-    def get_list_data(security_code, start_date, end_date, indexes):
-        if start_date is None or len(start_date) == 0:
-            sql = "select the_date from tquant_calendar_info order by the_date desc limit 20 "
-            tuple_the_date = CheckStockIsWrothBuyingHandler.dbService.query(sql)
-            if tuple_the_date is not None and len(tuple_the_date) > 0:
-                start_date = tuple_the_date[len(tuple_the_date) - 1][0].strftime('%Y-%m-%d')
-                end_date = datetime.datetime.now().strftime('%Y-%m-%d')
-
+    def get_list_data(security_code):
+        print('get_list_data', security_code)
         if security_code is not None and len(security_code) > 0:
-            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code, start_date, end_date)
+            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code)
             try:
                 tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
+                print('tuple_data', len(tuple_data))
                 list_data = []
                 for item in tuple_data:
-                    item_list = CheckStockIsWrothBuyingHandler.analysis_item(item, indexes)
+                    item_list = CheckStockIsWrothBuyingHandler.analysis_item(item)
                     list_data.append(item_list)
+                print('list_data 0 ', len(list_data[0]))
                 return list_data
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -66,118 +53,32 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
     def post(self):
         # method_log_list = self.deepcopy_list(self.log_list)
         security_code = ''
-        start_date = ''
-        end_date = ''
         try:
             security_code = self.get_argument('security_code')
-            start_date = self.get_argument('start_date')
-            end_date = self.get_argument('end_date')
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print(exc_type, exc_value, exc_traceback)
 
         security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
-        indexes = CheckStockIsWrothBuyingHandler.get_indexes()
-        table_thead_dict = CheckStockIsWrothBuyingHandler.get_table_thead_dict()
-        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, start_date, end_date, indexes)
+        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code)
         if list_data is not None and len(list_data) > 0:
-                self.render('modules/average_list.html', table=list_data, indexes=indexes, thead_dict=table_thead_dict, update_date=datetime.datetime.now(), security_info=security_info)
+                self.render('modules/average_list.html', table=list_data, update_date=datetime.datetime.now(), security_info=security_info)
         else:
             self.write('没有数据')
 
-
     @staticmethod
-    def get_table_thead_dict():
-        thead_dict = {}
-        thead_dict[0] = '交易日'
-        thead_dict[1] = '收'
-        thead_dict[2] = '钱'
-        thead_dict[3] = '量'
-
-        thead_dict[4] = 'ma3收均'
-        thead_dict[5] = 'ma3收均幅'
-        thead_dict[6] = 'ma3收均幅均'
-
-        thead_dict[7] = 'ma3日均钱'
-        thead_dict[8] = 'ma3日均钱幅'
-        thead_dict[9] = 'ma3日均钱幅均'
-
-        thead_dict[10] = 'ma3日均量'
-        thead_dict[11] = 'ma3日均量幅'
-        thead_dict[12] = 'ma3日均量幅均'
-
-        thead_dict[13] = 'ma3价均'
-        thead_dict[14] = 'ma3价均幅'
-        thead_dict[15] = 'ma3价均幅均'
-
-        thead_dict[16] = 'ma3钱留幅'
-        thead_dict[17] = 'ma3钱留幅均'
-
-        thead_dict[18] = 'ma3量留幅'
-        thead_dict[19] = 'ma3量留幅均'
-
-        thead_dict[20] = 'ma5收均'
-        thead_dict[21] = 'ma5收均幅'
-        thead_dict[22] = 'ma5收均幅均'
-
-        thead_dict[23] = 'ma5日均钱'
-        thead_dict[24] = 'ma5日均钱幅'
-        thead_dict[25] = 'ma5日均钱幅均'
-
-        thead_dict[26] = 'ma5日均量'
-        thead_dict[27] = 'ma5日均量幅'
-        thead_dict[28] = 'ma5日均量幅均'
-
-        thead_dict[29] = 'ma5价均'
-        thead_dict[30] = 'ma5价均幅'
-        thead_dict[31] = 'ma5价均幅均'
-
-        thead_dict[32] = 'ma5钱留幅'
-        thead_dict[33] = 'ma5钱留幅均'
-
-        thead_dict[34] = 'ma5量留幅'
-        thead_dict[35] = 'ma5量留幅均'
-
-        thead_dict[36] = 'ma10收均'
-        thead_dict[37] = 'ma10收均幅'
-        thead_dict[38] = 'ma10收均幅均'
-
-        thead_dict[39] = 'ma10日均钱'
-        thead_dict[40] = 'ma10日均钱幅'
-        thead_dict[41] = 'ma10日均钱幅均'
-
-        thead_dict[42] = 'ma10日均量'
-        thead_dict[43] = 'ma10日均量幅'
-        thead_dict[44] = 'ma10日均量幅均'
-
-        thead_dict[45] = 'ma10价均'
-        thead_dict[46] = 'ma10价均幅'
-        thead_dict[47] = 'ma10价均幅均'
-
-        thead_dict[48] = 'ma10钱留幅'
-        thead_dict[49] = 'ma10钱留幅均'
-
-        thead_dict[50] = 'ma10量留幅'
-        thead_dict[51] = 'ma10量留幅均'
-
-        return thead_dict
-
-    @staticmethod
-    def analysis_item(item, indexes):
+    def analysis_item(item):
+        print('analysis_item', item)
         item_list = []
-        for i in indexes:
+        i = 0
+        while i < len(item):
             if i == 0:
                 item_list.append([item[i].strftime('%m%d'), ''])
-            elif i >= 1 and i <= 3:
-                item_list.append([item[i], ''])
-            elif (i >= 16 and i <= 19) or (i >= 32 and i <= 35) or (i >= 48 and i <= 51):
+            elif (i >= 5 and i <= 7) or i == 10 or i == 12 or i == 14 or i == 16 or i == 18 or i == 19:
                 item_list.append([item[i], CheckStockIsWrothBuyingHandler.get_css(item[i])])
-            elif i == 4 or i == 7 or i == 10 or i == 13 \
-                    or i == 20 or i == 23 or i == 26 or i == 29 \
-                    or i == 36 or i == 39 or i == 42 or i == 45:
-                item_list.append([item[i], ''])
             else:
-                item_list.append([item[i], CheckStockIsWrothBuyingHandler.get_css(item[i])])
+                item_list.append([item[i], ''])
+            i += 1
 
         return item_list
 
@@ -227,47 +128,36 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             return ''
 
     @staticmethod
-    def get_query_sql(security_code, start_date, end_date):
-        sql = "select ma3.the_date, ma3.close, ma3.amount, ma3.vol, " \
-              "ma3.close_avg ma3_close_avg, ma3.close_avg_chg ma3_close_avg_chg, ma3.close_avg_chg_avg ma3_close_avg_chg_avg, " \
-              "ma3.amount_avg ma3_amount_avg, ma3.amount_avg_chg ma3_amount_avg_chg, ma3.amount_avg_chg_avg ma3_amount_avg_chg_avg, " \
-              "ma3.vol_avg ma3_vol_avg, ma3.vol_avg_chg ma3_vol_avg_chg, ma3.vol_avg_chg_avg ma3_vol_avg_chg_avg, " \
-              "ma3.price_avg ma3_price_avg, ma3.price_avg_chg ma3_price_avg_chg, ma3.price_avg_chg_avg ma3_price_avg_chg_avg, " \
-              "ma3.amount_flow_chg ma3_amount_flow_chg, ma3.amount_flow_chg_avg ma3_amount_flow_chg_avg, " \
-              "ma3.vol_flow_chg ma3_vol_flow_chg, ma3.vol_flow_chg_avg ma3_vol_flow_chg_avg, " \
-              "" \
-              "ma5.close_avg ma5_close_avg, ma5.close_avg_chg ma5_close_avg_chg, ma5.close_avg_chg_avg ma5_close_avg_chg_avg, " \
-              "ma5.amount_avg ma5_amount_avg, ma5.amount_avg_chg ma5_amount_avg_chg, ma5.amount_avg_chg_avg ma5_amount_avg_chg_avg, " \
-              "ma5.vol_avg ma5_vol_avg, ma5.vol_avg_chg ma5_vol_avg_chg, ma5.vol_avg_chg_avg ma5_vol_avg_chg_avg, " \
-              "ma5.price_avg ma5_price_avg, ma5.price_avg_chg ma5_price_avg_chg, ma5.price_avg_chg_avg ma5_price_avg_chg_avg, " \
-              "ma5.amount_flow_chg ma5_amount_flow_chg, ma5.amount_flow_chg_avg ma5_amount_flow_chg_avg, " \
-              "ma5.vol_flow_chg ma5_vol_flow_chg, ma5.vol_flow_chg_avg ma5_vol_flow_chg_avg, " \
-              "" \
-              "ma10.close_avg ma10_close_avg, ma10.close_avg_chg ma10_close_avg_chg, ma10.close_avg_chg_avg ma10_close_avg_chg_avg, " \
-              "ma10.amount_avg ma10_amount_avg, ma10.amount_avg_chg ma10_amount_avg_chg, ma10.amount_avg_chg_avg ma10_amount_avg_chg_avg, " \
-              "ma10.vol_avg ma10_vol_avg, ma10.vol_avg_chg ma10_vol_avg_chg, ma10.vol_avg_chg_avg ma10_vol_avg_chg_avg, " \
-              "ma10.price_avg ma10_price_avg, ma10.price_avg_chg ma10_price_avg_chg, ma10.price_avg_chg_avg ma10_price_avg_chg_avg, " \
-              "ma10.amount_flow_chg ma10_amount_flow_chg, ma10.amount_flow_chg_avg ma10_amount_flow_chg_avg, " \
-              "ma10.vol_flow_chg ma10_vol_flow_chg, ma10.vol_flow_chg_avg ma10_vol_flow_chg_avg " \
-              "" \
-              "from (" \
-              "select * from tquant_stock_average_line " \
-              "where ma = 3 and security_code = {security_code} and the_date >= {start_date} and the_date <= {end_date}" \
-              ") ma3 " \
+    def get_query_sql(security_code):
+        sql = "select " \
+              "kline.the_date, kline.open, kline.high, kline.low, kline.close, " \
+              "kline.close_chg, kline.close_price_avg_chg, ma10close_ma_price_avg_chg, " \
+              "kline.vol, kline.amount, ma10amount_flow_chg, kline.price_avg, kline.price_avg_chg, " \
+              "ma3_price_avg, ma3_price_avg_chg, " \
+              "ma5_price_avg, ma5_price_avg_chg, " \
+              "ma10_price_avg, ma10_price_avg_chg, " \
+              "ma10_price_avg_chg_avg " \
+              "from " \
+              "tquant_stock_day_kline kline " \
               "left join " \
-              "(select * from tquant_stock_average_line " \
-              "where ma = 5 and security_code = {security_code} and the_date >= {start_date} and the_date <= {end_date}" \
-              ") ma5 " \
-              "on ma3.the_date = ma5.the_date " \
+              "( select security_code, the_date, price_avg ma3_price_avg, price_avg_chg ma3_price_avg_chg " \
+              "from tquant_stock_average_line " \
+              "where ma = 3 and security_code = {security_code}) ma3 " \
+              "on kline.security_code = ma3.security_code and kline.the_date = ma3.the_date " \
               "left join " \
-              "(select * from tquant_stock_average_line " \
-              "where ma = 10 and security_code = {security_code} and the_date >= {start_date} and the_date <= {end_date}" \
-              ") ma10 on ma3.the_date = ma10.the_date " \
-              "order by ma3.the_date desc "
-        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code),
-                         start_date=CheckStockIsWrothBuyingHandler.quotes_surround(start_date),
-                         end_date=CheckStockIsWrothBuyingHandler.quotes_surround(end_date)
-                         )
+              "(select security_code, the_date, price_avg ma5_price_avg, price_avg_chg ma5_price_avg_chg " \
+              "from tquant_stock_average_line " \
+              "where ma = 5 and security_code = {security_code}) ma5 " \
+              "on kline.security_code = ma5.security_code and kline.the_date = ma5.the_date " \
+              "left join " \
+              "(select security_code, the_date, price_avg ma10_price_avg, price_avg_chg ma10_price_avg_chg, " \
+              "price_avg_chg_avg ma10_price_avg_chg_avg, close_ma_price_avg_chg ma10close_ma_price_avg_chg, " \
+              "amount_flow_chg ma10amount_flow_chg " \
+              "from tquant_stock_average_line " \
+              "where ma = 10 and security_code = {security_code}) ma10 " \
+              "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
+              "order by kline.the_date desc limit 20 "
+        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
         return sql
 
     @staticmethod

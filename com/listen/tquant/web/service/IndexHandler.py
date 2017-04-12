@@ -17,18 +17,5 @@ class IndexHandler(tornado.web.RequestHandler):
 
     def get(self):
         dbService = DbService()
-
-        sql = "select the_date from tquant_calendar_info order by the_date desc limit 20"
-        tuple_the_date = dbService.query(sql)
-        if tuple_the_date is not None and len(tuple_the_date) > 0:
-            start_date = tuple_the_date[len(tuple_the_date) - 1][0].strftime('%Y-%m-%d')
-            end_date= tuple_the_date[0][0].strftime('%Y-%m-%d')
-        else:
-            start_date = '2017-03-05'
-            end_date = '2017-04-05'
-
-        self.render('index.html',
-                    start_date=start_date,
-                    end_date=end_date,
-                    )
+        self.render('index.html')
 

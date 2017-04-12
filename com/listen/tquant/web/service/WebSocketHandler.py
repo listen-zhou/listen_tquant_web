@@ -22,10 +22,9 @@ class WebSocketHandler(WebSocketHandler):
             security_code = str(security_codes[0])
             print(security_code)
             security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
-            indexes = CheckStockIsWrothBuyingHandler.get_indexes()
-            table_thead_dict = CheckStockIsWrothBuyingHandler.get_table_thead_dict()
-            list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, None, None, indexes)
-            result = self.render_string('modules/average_list.html', table=list_data, indexes=indexes, thead_dict=table_thead_dict, update_date=datetime.datetime.now(), security_info=security_info)
+            list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code)
+            print('list_data', list_data)
+            result = self.render_string('modules/average_list.html', table=list_data, update_date=datetime.datetime.now(), security_info=security_info)
             self.write_message(result)
 
     def on_close(self):

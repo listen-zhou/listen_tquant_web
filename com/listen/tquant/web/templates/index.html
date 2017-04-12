@@ -35,9 +35,6 @@
                 ws.send('hello');
                 console.log('redis client hello')
             }
-            $('.date').datetimepicker({
-                format: 'YYYY-MM-DD'
-            });
         });
 
         function duang(){
@@ -109,16 +106,6 @@
     </style>
 </head>
     <body>
-        <label class="sr-only">股票代码</label>
-        <input type="text" class="" id="security_code"
-               placeholder="请输入股票代码">
-        <label class="sr-only">开始时间</label>
-        <input type="text" readonly class="date" id="start_date"
-               placeholder="请输入开始时间" value="{{ start_date }}">
-        <label class="sr-only">结束时间</label>
-        <input type="text" class="date" id="end_date"
-               placeholder="请输入结束时间" value="{{end_date}}">
-        <button class="btn btn-default" onclick="duang()">Duang</button>
         <div id="table">
 
         </div>
