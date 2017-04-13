@@ -27,31 +27,28 @@
     <script type="text/javascript">
         var ws
         $(function(){
-            ws = new WebSocket("ws://localhost:8000/average_line/ws");
-            ws.onmessage = function(e){
-                $("#table").html(e.data);
-            }
-            ws.onopen = function(){
-                ws.send('hello');
-                console.log('redis client hello')
-            }
+            <!--WebSocket代码，注释掉，不用了-->
+            <!--ws = new WebSocket("ws://localhost:8000/average_line/ws");-->
+            <!--ws.onmessage = function(e){-->
+                <!--$("#table").html(e.data);-->
+            <!--}-->
+            <!--ws.onopen = function(){-->
+                <!--ws.send('hello');-->
+                <!--console.log('redis client hello')-->
+            <!--}-->
+            duang()
+            interval_security = window.setInterval("duang()", 5000);
         });
 
         function duang(){
-            var security_code = $('#security_code').val()
-            var start_date = $('#start_date').val();
-            var end_date = $('#end_date').val();
+            var security_code = $('#security_code').val();
             console.log(security_code);
-            console.log(start_date);
-            console.log(end_date);
             var url = "/average_line";
             $.ajax({
                 url: url,
                 type: 'post',
                 data: {
-                    'security_code': security_code,
-                    'start_date': start_date,
-                    'end_date': end_date
+                    'security_code': security_code
                 },
                 dataType: 'text',
                 success: function(data){
@@ -106,6 +103,7 @@
     </style>
 </head>
     <body>
+        <input id="security_code" value="{{ security_code }}">
         <div id="table">
 
         </div>

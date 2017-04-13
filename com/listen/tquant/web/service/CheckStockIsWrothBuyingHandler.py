@@ -31,17 +31,15 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
 
     @staticmethod
     def get_list_data(security_code):
-        print('get_list_data', security_code)
         if security_code is not None and len(security_code) > 0:
             sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code)
+            print(sql)
             try:
                 tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
-                print('tuple_data', len(tuple_data))
                 list_data = []
                 for item in tuple_data:
                     item_list = CheckStockIsWrothBuyingHandler.analysis_item(item)
                     list_data.append(item_list)
-                print('list_data 0 ', len(list_data[0]))
                 return list_data
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -62,13 +60,12 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
         list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code)
         if list_data is not None and len(list_data) > 0:
-                self.render('modules/average_list.html', table=list_data, update_date=datetime.datetime.now(), security_info=security_info)
+                self.render('modules/average_list.html', table=list_data, update_date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), security_info=security_info)
         else:
             self.write('没有数据')
 
     @staticmethod
     def analysis_item(item):
-        print('analysis_item', item)
         item_list = []
         i = 0
         while i < len(item):
@@ -156,7 +153,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "from tquant_stock_average_line " \
               "where ma = 10 and security_code = {security_code}) ma10 " \
               "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
-              "order by kline.the_date desc limit 20 "
+              "where kline.security_code = {security_code} " \
+              "order by kline.the_date desc limit 50 "
         sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
         return sql
 

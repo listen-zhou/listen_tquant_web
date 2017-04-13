@@ -5,6 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+from tornado.wsgi import WSGIAdapter
 import sys
 
 
@@ -31,6 +32,10 @@ class App(tornado.web.Application):
             template_path=os.path.join(os.path.dirname(__file__), os.path.pardir, 'templates'),
             static_path=os.path.join(os.path.dirname(__file__), os.path.pardir, 'static'),
             debug=True,
+            autoreload=True,
+            compiled_template_cache=False,
+            static_hash_cache=False,
+            serve_traceback=True,
         )
         tornado.web.Application.__init__(self, handlers, **settings)
 
