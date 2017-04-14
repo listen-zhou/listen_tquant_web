@@ -30,9 +30,9 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         return None
 
     @staticmethod
-    def get_list_data(security_code):
+    def get_list_data(security_code, limit):
         if security_code is not None and len(security_code) > 0:
-            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code)
+            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code, limit)
             print(sql)
             try:
                 tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
@@ -51,14 +51,16 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
     def post(self):
         # method_log_list = self.deepcopy_list(self.log_list)
         security_code = ''
+        limit = 50
         try:
             security_code = self.get_argument('security_code')
+            limit = self.get_argument('limit')
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print(exc_type, exc_value, exc_traceback)
 
         security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
-        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code)
+        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, limit)
         if list_data is not None and len(list_data) > 0:
                 self.render('modules/average_list.html', table=list_data, update_date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), security_info=security_info)
         else:
@@ -125,7 +127,7 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             return ''
 
     @staticmethod
-    def get_query_sql(security_code):
+    def get_query_sql(security_code, limit=50):
         sql = "select " \
               "kline.the_date, kline.open, kline.high, kline.low, kline.close, " \
               "kline.close_chg, kline.close_price_avg_chg, ma10close_ma_price_avg_chg, " \
@@ -133,7 +135,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "ma3_price_avg, ma3_price_avg_chg, " \
               "ma5_price_avg, ma5_price_avg_chg, " \
               "ma10_price_avg, ma10_price_avg_chg, " \
-              "ma10_price_avg_chg_avg " \
+              "ma10_price_avg_chg_avg, " \
+              "(cldr.day_of_week + 1) day_of_week " \
               "from " \
               "tquant_stock_day_kline kline " \
               "left join " \
@@ -153,9 +156,12 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "from tquant_stock_average_line " \
               "where ma = 10 and security_code = {security_code}) ma10 " \
               "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
+              "left join tquant_calendar_info cldr " \
+              "on kline.the_date = cldr.the_date " \
               "where kline.security_code = {security_code} " \
-              "order by kline.the_date desc limit 50 "
-        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
+              "order by kline.the_date desc limit {limit} "
+        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code),
+                         limit=limit)
         return sql
 
     @staticmethod

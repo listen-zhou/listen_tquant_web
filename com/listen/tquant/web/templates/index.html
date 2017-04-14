@@ -42,13 +42,15 @@
 
         function duang(){
             var security_code = $('#security_code').val();
+            var limit = $('#limit').val();
             console.log(security_code);
             var url = "/average_line";
             $.ajax({
                 url: url,
                 type: 'post',
                 data: {
-                    'security_code': security_code
+                    'security_code': security_code,
+                    'limit': limit
                 },
                 dataType: 'text',
                 success: function(data){
@@ -103,7 +105,7 @@
     </style>
 </head>
     <body>
-        <input id="security_code" value="{{ security_code }}">
+        股票代码:<input id="security_code" value="{{ security_code }}"> &nbsp;&nbsp;查询最大行数:<input id="limit" value="{{ limit }}">
         <div id="table">
 
         </div>
