@@ -3,18 +3,13 @@
 <head>
     <title>值得买？</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{{ static_url('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ static_url('css/bootstrap-datetimepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ static_url('css/signin.css') }}">
+    <!-- ZUI 标准版压缩后的 CSS 文件 -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/zui/1.6.0/css/zui.min.css">
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="{{ static_url('js/jquery.min.js') }}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{ static_url('js/bootstrap.min.js') }}"></script>
-    <script src="{{ static_url('js/bootstrap.min.js') }}"></script>
-    <script src="{{ static_url('js/moment-with-locales.min.js') }}"></script>
-    <script src="{{ static_url('js/bootstrap-datetimepicker.min.js') }}"></script>
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.6.0/lib/jquery/jquery.js"></script>
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.6.0/js/zui.min.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -23,19 +18,9 @@
     <script src="http://cdn.bootcss.com/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 
-    <script src="{{ static_url('js/tquant_utils.js') }}"></script>
     <script type="text/javascript">
         var ws
         $(function(){
-            <!--WebSocket代码，注释掉，不用了-->
-            <!--ws = new WebSocket("ws://localhost:8000/average_line/ws");-->
-            <!--ws.onmessage = function(e){-->
-                <!--$("#table").html(e.data);-->
-            <!--}-->
-            <!--ws.onopen = function(){-->
-                <!--ws.send('hello');-->
-                <!--console.log('redis client hello')-->
-            <!--}-->
             duang()
             interval_security = window.setInterval("duang()", 5000);
         });
@@ -105,10 +90,45 @@
     </style>
 </head>
     <body>
-        股票代码:<input id="security_code" value="{{ security_code }}"> &nbsp;&nbsp;查询最大行数:<input id="limit" value="{{ limit }}">
-        <div id="table">
+        <div class="container form-horizontal form-inline">
+            <input id="security_code" class="form-control form-focus" autofocus type="text" placeholder="输入股票代码">
+            <input type="number" class="form-control" id="limit" value="50" max="100" min="20" step="5" placeholder="输入近几日数量">
+        </div>
+        <div class="container">
+            <table class="table table-bordered table-condensed table-auto">
+                <thead>
+                    <tr class="success">
+                        <td>日期</td>
+                        <td>开盘</td>
+                        <td>最高</td>
+                        <td>最低</td>
+                        <td>收盘</td>
 
+                        <td>升跌%</td>
+                        <td>收盘/日均价</td>
+                        <td>收盘/10日均</td>
+
+                        <td>交易量(股)</td>
+                        <td>交易金额(元)</td>
+                        <td>钱流</td>
+                        <td>日均价</td>
+                        <td>升跌%</td>
+
+                        <td>3天均</td>
+                        <td>升跌%</td>
+
+                        <td>5天均</td>
+                        <td>升跌%</td>
+
+                        <td>10天均</td>
+                        <td>升跌%</td>
+                        <td>升跌均10天</td>
+                        <td>周几</td>
+                    </tr>
+                </thead>
+                <tbody id="table"></tbody>
+
+            </table>
         </div>
     </body>
-
 </html>
