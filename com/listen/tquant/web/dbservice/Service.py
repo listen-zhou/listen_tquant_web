@@ -163,3 +163,8 @@ class DbService(object):
         if tuple_security_codes is not None and len(tuple_security_codes) > 0:
             return tuple_security_codes
         return None
+
+    def get_stock_worth_buying(self):
+        sql = "select security_code, security_name from tquant_security_info where worth_buying > 0"
+        tuple_data = self.query(sql)
+        return tuple_data

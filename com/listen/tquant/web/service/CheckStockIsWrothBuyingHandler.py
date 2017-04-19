@@ -18,6 +18,10 @@ from com.listen.tquant.web.dbservice.Service import DbService
 class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
     dbService = DbService()
 
+    def get_all_worth_buying(self):
+        tuple_data = CheckStockIsWrothBuyingHandler.dbService.query_all_security_codes()
+
+
     @staticmethod
     def get_security_info(security_code):
         print('get_security_info', security_code)
@@ -48,6 +52,10 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         else:
             return None
 
+    def get_info(self):
+        security_code = self.get_argument('security_code')
+        security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
+
     def post(self):
         # method_log_list = self.deepcopy_list(self.log_list)
         security_code = ''
@@ -58,11 +66,9 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print(exc_type, exc_value, exc_traceback)
-
-        security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
         list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, limit)
         if list_data is not None and len(list_data) > 0:
-                self.render('modules/average_list.html', table=list_data, update_date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), security_info=security_info)
+                self.render('modules/average_list.html', table=list_data)
         else:
             self.write('没有数据')
 

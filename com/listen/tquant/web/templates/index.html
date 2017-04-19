@@ -25,6 +25,24 @@
             interval_security = window.setInterval("duang()", 5000);
         });
 
+        function worth_buying(){
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {},
+                dataType: 'text',
+                success: function(data){
+                    $('#worth_buying').html('')
+                    if(data != ''){
+                        $('#worth_buying').append(data);
+                    }
+                    else{
+                        $('#worth_buying').append('没有数据');
+                    }
+                }
+            });
+        }
+
         function duang(){
             var security_code = $('#security_code').val();
             var limit = $('#limit').val();
