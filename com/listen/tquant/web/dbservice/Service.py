@@ -35,6 +35,17 @@ class DbService(object):
             self.conn.close()
             print('---> 关闭连接')
 
+    def update(self, sql):
+        try:
+            if sql:
+                count = self.cursor.execute(sql)
+                return count
+            else:
+                return 0
+        except Exception:
+            print('error sql:', sql)
+            traceback.format_exc()
+
     # noinspection SpellCheckingInspection
     def insert(self, upsert_sql):
         try:
@@ -45,7 +56,7 @@ class DbService(object):
                 return False
         except Exception:
             print('error sql:', upsert_sql)
-            traceback.print_exc()
+            traceback.format_exc()
 
     # noinspection SpellCheckingInspection,PyBroadException
     def insert_many(self, upsert_sql_list):
@@ -165,6 +176,9 @@ class DbService(object):
         return None
 
     def get_stock_worth_buying(self):
-        sql = "select security_code, security_name from tquant_security_info where worth_buying > 0"
+        sql = "select security_code, security_name " \
+              "from tquant_security_info " \
+              "where worth_buying > 0 " \
+              "order by security_code asc "
         tuple_data = self.query(sql)
         return tuple_data

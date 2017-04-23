@@ -16,33 +16,45 @@ from com.listen.tquant.web.dbservice.Service import DbService
 
 
 class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
+
     dbService = DbService()
 
-    def get_all_worth_buying(self):
-        tuple_data = CheckStockIsWrothBuyingHandler.dbService.query_all_security_codes()
+    def put(self):
+        security_code = self.get_argument('security_code')
+        worth_value = self.get_argument('worth_value')
+        return_dict= {}
+        if security_code is None or len(security_code) == 0:
+            return_dict['state'] = False
+            return_dict['msg'] = '股票代码不能为空'
+        else:
+            sql = "select count(*) from tquant_security_info where security_code = {security_code}"
+            sql = sql.format(security_code=self.quotes_surround(security_code))
+            count = self.dbService.query(sql)[0][0]
+            if count == 1:
+                sql = "update tquant_security_info set worth_buying = {worth_value} where security_code = {security_code}"
+                sql = sql.format(security_code=self.quotes_surround(security_code),
+                                 worth_value=worth_value)
+                self.dbService.update(sql)
+                return_dict['state'] = True
+                return_dict['msg'] = '操作成功'
+            else:
+                return_dict['state'] = False
+                return_dict['msg'] = '请确认股票代码是否正确'
+        self.write(return_dict)
 
+    def get(self):
+        list_data = self.dbService.get_stock_worth_buying()
+        self.render('modules/worth_buying.html', table=list_data)
 
-    @staticmethod
-    def get_security_info(security_code):
-        print('get_security_info', security_code)
-        sql = "select security_code, security_name " \
-              "from tquant_security_info where security_code = {security_code}"
-        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code))
-        tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
-        if tuple_data is not None and len(tuple_data) > 0:
-            return tuple_data[0]
-        return None
-
-    @staticmethod
-    def get_list_data(security_code, limit):
+    def get_list_data(self, security_code, limit):
         if security_code is not None and len(security_code) > 0:
-            sql = CheckStockIsWrothBuyingHandler.get_query_sql(security_code, limit)
+            sql = self.get_query_sql(security_code, limit)
             print(sql)
             try:
-                tuple_data = CheckStockIsWrothBuyingHandler.dbService.query(sql)
+                tuple_data = self.dbService.query(sql)
                 list_data = []
                 for item in tuple_data:
-                    item_list = CheckStockIsWrothBuyingHandler.analysis_item(item)
+                    item_list = self.analysis_item(item)
                     list_data.append(item_list)
                 return list_data
             except Exception:
@@ -52,12 +64,7 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         else:
             return None
 
-    def get_info(self):
-        security_code = self.get_argument('security_code')
-        security_info = CheckStockIsWrothBuyingHandler.get_security_info(security_code)
-
     def post(self):
-        # method_log_list = self.deepcopy_list(self.log_list)
         security_code = ''
         limit = 50
         try:
@@ -66,51 +73,27 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             print(exc_type, exc_value, exc_traceback)
-        list_data = CheckStockIsWrothBuyingHandler.get_list_data(security_code, limit)
+        list_data = self.get_list_data(security_code, limit)
         if list_data is not None and len(list_data) > 0:
-                self.render('modules/average_list.html', table=list_data)
+                self.render('modules/average_list.html', table=list_data, indexes=range(len(list_data)))
         else:
             self.write('没有数据')
 
-    @staticmethod
-    def analysis_item(item):
+    def analysis_item(self, item):
         item_list = []
         i = 0
         while i < len(item):
             if i == 0:
-                item_list.append([item[i].strftime('%m%d'), ''])
+                item_list.append([item[i].strftime('%m-%d'), ''])
             elif (i >= 5 and i <= 7) or i == 10 or i == 12 or i == 14 or i == 16 or i == 18 or i == 19:
-                item_list.append([item[i], CheckStockIsWrothBuyingHandler.get_css(item[i])])
+                item_list.append([item[i], self.get_css(item[i])])
             else:
                 item_list.append([item[i], ''])
             i += 1
 
         return item_list
 
-    # def get_flow_css(self, val):
-    #     if val is None :
-    #         return ''
-    #     elif val >= 3:
-    #         return 'm3'
-    #     elif val >= 2:
-    #         return 'm2'
-    #     elif val >= 1.5:
-    #         return 'm1'
-    #     elif val > 1:
-    #         return 'm0'
-    #     elif val < 1:
-    #         return 'l0'
-    #     elif val <= 0.75:
-    #         return 'l1'
-    #     elif val <= 0.5:
-    #         return 'l2'
-    #     elif val <= 0.25:
-    #         return 'l3'
-    #     else:
-    #         return ''
-
-    @staticmethod
-    def get_css(val):
+    def get_css(self, val):
         if val is None:
             return ''
         elif val >= 3:
@@ -132,8 +115,7 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         else:
             return ''
 
-    @staticmethod
-    def get_query_sql(security_code, limit=50):
+    def get_query_sql(self, security_code, limit=50):
         sql = "select " \
               "kline.the_date, kline.open, kline.high, kline.low, kline.close, " \
               "kline.close_chg, kline.close_price_avg_chg, ma10close_ma_price_avg_chg, " \
@@ -166,12 +148,11 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "on kline.the_date = cldr.the_date " \
               "where kline.security_code = {security_code} " \
               "order by kline.the_date desc limit {limit} "
-        sql = sql.format(security_code=CheckStockIsWrothBuyingHandler.quotes_surround(security_code),
+        sql = sql.format(security_code=self.quotes_surround(security_code),
                          limit=limit)
         return sql
 
-    @staticmethod
-    def quotes_surround(str):
+    def quotes_surround(self, str):
         if str is not None:
             return "'" + str + "'"
         return str

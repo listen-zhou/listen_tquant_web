@@ -17,5 +17,5 @@ class IndexHandler(tornado.web.RequestHandler):
 
     def get(self):
         dbService = DbService()
-        self.render('index.html', security_code='002466', limit=50)
+        self.render('index.html')
 

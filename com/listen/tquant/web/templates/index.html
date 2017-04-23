@@ -21,14 +21,25 @@
     <script type="text/javascript">
         var ws
         $(function(){
-            duang()
+            duang();
             interval_security = window.setInterval("duang()", 5000);
+            worth_buying();
+            interval_worth = window.setInterval("worth_buying()", 5000);
         });
 
+        function security_click(obj){
+            var security_code = obj.value;
+            var security_name = obj.innerText;
+            $("#security_code").val(security_code);
+            $("#security_name").text("【" + security_code + " " + security_name + "】");
+            duang();
+        }
+
         function worth_buying(){
+            var url = '/worth_buying';
             $.ajax({
                 url: url,
-                type: 'post',
+                type: 'get',
                 data: {},
                 dataType: 'text',
                 success: function(data){
@@ -43,10 +54,54 @@
             });
         }
 
+        function worth_buying_add(){
+            var security_code = $("#security_code_add").val();
+            var worth_value = 1;
+            worth_buying_put(security_code, worth_value);
+            $("#security_code_add").val('');
+        }
+
+        function worth_buying_delete(security_code){
+            var worth_value = 0;
+            worth_buying_put(security_code, worth_value);
+        }
+
+        function worth_buying_put(security_code, worth_value){
+            if(security_code != '' && security_code.length == 6){
+                var url = "/worth_buying_put";
+                $.ajax({
+                    url: url,
+                    type: 'put',
+                    data: {
+                        'security_code': security_code,
+                        'worth_value': worth_value
+                    },
+                    dataType: 'json',
+                    success: function(data){
+                        if(data.state == true){
+                            new $.zui.Messager('提示消息：操作成功', {
+                                type: 'success', // 定义颜色主题
+                            }).show();
+                            worth_buying();
+                        }
+                        else{
+                            new $.zui.Messager('提示消息：' + data.msg, {
+                                type: 'warning', // 定义颜色主题
+                            }).show();
+                        }
+                    }
+                });
+            }
+            else{
+                new $.zui.Messager('提示消息：股票代码为6位数字', {
+                    type: 'warning', // 定义颜色主题
+                }).show();
+            }
+        }
+
         function duang(){
             var security_code = $('#security_code').val();
             var limit = $('#limit').val();
-            console.log(security_code);
             var url = "/average_line";
             $.ajax({
                 url: url,
@@ -57,12 +112,13 @@
                 },
                 dataType: 'text',
                 success: function(data){
-                    $('#table').html('')
+                    var date = new Date();
+                    $('#current_time').text(date.toLocaleString());
                     if(data != ''){
-                        $('#table').append(data);
+                        $('#table').html(data);
                     }
                     else{
-                        $('#table').append('没有数据');
+                        $('#table').html('没有数据');
                     }
                 }
             });
@@ -108,9 +164,15 @@
     </style>
 </head>
     <body>
+        <div class="container collapse in" id="worth_buying"></div>
         <div class="container form-horizontal form-inline">
-            <input id="security_code" class="form-control form-focus" autofocus type="text" placeholder="输入股票代码">
-            <input type="number" class="form-control" id="limit" value="20" max="100" min="20" step="5" placeholder="输入近几日数量">
+            <input id="security_code" class="form-control form-focus" autofocus type="hidden" placeholder="输入股票代码" style="width: 100px">
+            <label id="security_name"></label>
+            最近<input type="number" class="form-control" id="limit" value="20" max="1000" min="20" step="5" style="width: 55px">个交易日行情
+            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#worth_buying">折叠/展开</button>
+            <input id="security_code_add" class="form-control form-focus" autofocus type="text" placeholder="添加值得买股票代码">
+            <button type="button" class="btn btn-primary" onclick="worth_buying_add()">添加</button>
+            <label id="current_time" style="color:red"></label>
         </div>
         <div class="container">
             <table class="table table-bordered table-condensed table-auto">
