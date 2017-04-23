@@ -64,6 +64,8 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         else:
             return None
 
+
+
     def post(self):
         security_code = ''
         limit = 50
