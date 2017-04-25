@@ -126,35 +126,35 @@
 
     <style type="text/css">
         .m3{
-            background: #FF0000;
-            color: #FFFF00;
+            background: red;
+            color: gold;
         }
         .m2{
-            background: #FF3300;
-            color: #FFFF00;
+            background: red;
+            color: gold;
         }
         .m1{
-            background: #FF6600;
-            color: #FFFF00;
+            background: red;
+            color: gold;
         }
         .m0{
-            color: #FF0000;
+            color: red;
         }
 
         .l0{
-            color: #00FF00;
+            color: green;
         }
         .l1{
-            background: #00FF66;
-            color: #FFFF00;
+            background: green;
+            color: gold;
         }
         .l2{
-            background: #00FF33;
-            color: #FFFF00;
+            background: green;
+            color: gold;
         }
         .l3{
-            background: #00FF00;
-            color: #FFFF00;
+            background: green;
+            color: gold;
         }
         .table{
             font-size: 3px;
@@ -166,10 +166,10 @@
         <div class="container form-horizontal form-inline">
             <input id="security_code" class="form-control form-focus" autofocus type="hidden" placeholder="输入股票代码" style="width: 100px">
             <label id="security_name"></label>
-            最近<input type="number" class="form-control" id="limit" value="20" max="1000" min="20" step="5" style="width: 55px">个交易日行情
-            <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#worth_buying">折叠/展开</button>
-            <input id="security_code_add" class="form-control form-focus" autofocus type="text" placeholder="添加值得买股票代码">
-            <button type="button" class="btn btn-primary" onclick="worth_buying_add()">添加</button>
+            最近<input type="number" class="form-control input-sm" id="limit" value="20" max="1000" min="20" step="5" style="width: 55px">个交易日行情
+            <button type="button" class="btn btn-mini btn-info" data-toggle="collapse" data-target="#worth_buying">折叠/展开</button>
+            <input id="security_code_add" class="form-control input-sm form-focus" autofocus type="text" placeholder="添加值得买股票代码">
+            <button type="button" class="btn btn-mini btn-primary" onclick="worth_buying_add()">添加</button>
             <label id="current_time" style="color:red"></label>
         </div>
         <div class="container">
@@ -183,25 +183,31 @@
                         <td>收盘</td>
 
                         <td>升跌%</td>
-                        <td>收盘/日均价</td>
-                        <td>收盘/10日均</td>
+                        <td>收/日均</td>
+                        <td>收/10日均</td>
 
                         <td>交易量(股)</td>
-                        <td>交易金额(元)</td>
+                        <td>交易额(元)</td>
                         <td>钱流</td>
-                        <td>日均价</td>
+                        <td>顶底</td>
+                        <td>日均</td>
                         <td>升跌%</td>
 
                         <td>3天均</td>
                         <td>升跌%</td>
+                        <td>升跌均</td>
+                        <td>连续</td>
 
                         <td>5天均</td>
                         <td>升跌%</td>
+                        <td>升跌均</td>
+                        <td>连续</td>
 
                         <td>10天均</td>
                         <td>升跌%</td>
-                        <td>升跌均10天</td>
-                        <td>周几</td>
+                        <td>升跌均</td>
+                        <td>连续</td>
+                        <td>周</td>
                     </tr>
                 </thead>
                 <tbody id="table"></tbody>

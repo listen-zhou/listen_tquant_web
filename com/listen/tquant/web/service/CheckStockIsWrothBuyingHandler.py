@@ -77,7 +77,7 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             print(exc_type, exc_value, exc_traceback)
         list_data = self.get_list_data(security_code, limit)
         if list_data is not None and len(list_data) > 0:
-                self.render('modules/average_list.html', table=list_data, indexes=range(len(list_data)))
+                self.render('modules/average_list.html', table=list_data)
         else:
             self.write('没有数据')
 
@@ -85,18 +85,84 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
         item_list = []
         i = 0
         while i < len(item):
+            value = item[i]
+            if value is None:
+                value = ''
             if i == 0:
-                item_list.append([item[i].strftime('%m-%d'), ''])
-            elif (i >= 5 and i <= 7) or i == 10 or i == 12 or i == 14 or i == 16 or i == 18 or i == 19:
-                item_list.append([item[i], self.get_css(item[i])])
+                item_list.append([value.strftime('%m%d'), ''])
+            elif (i >= 5 and i <= 7) or i == 12 \
+                    or i == 14 or i == 16 or i == 18 or i == 19 \
+                    or (i >= 24 and i <= 25):
+                item_list.append([str(value) + '%', self.get_css(value)])
+            elif i >= 21 and i <= 23:
+                item_list.append([self.get_diff_arrow(value), ''])
+            elif i == 10:
+                item_list.append([str(value) + '%', self.get_amount_flow_css(item[12])])
+            elif i == 26:
+                item_list.append([self.get_amount_flow_arrow(value, item[12]), ''])
             else:
-                item_list.append([item[i], ''])
+                item_list.append([value, ''])
             i += 1
 
         return item_list
 
+    def get_amount_flow_css(self, price_avg_chg):
+        if price_avg_chg is not None:
+            if price_avg_chg >= 0:
+                return 'm0'
+            else:
+                return 'l0'
+        else:
+            return ''
+
+    def get_amount_flow_arrow(self, val, price_avg_chg):
+        if val is not None and price_avg_chg is not None:
+            if price_avg_chg > 0:
+                if val > 100 and val < 150:
+                    return '../static/img/stop2.gif'
+                elif val >= 150 and val < 200:
+                    return '../static/img/up2.gif'
+                elif val >= 200:
+                    return '../static/img/up1.gif'
+                elif val == 100:
+                    return ''
+                elif val < 70 and val > 50:
+                    return '../static/img/down4.gif'
+                elif val <= 50 and val > 0:
+                    return '../static/img/down3.gif'
+                else:
+                    return ''
+            elif price_avg_chg < 0:
+                if val > 100 and val < 150:
+                    return '../static/img/stop3.gif'
+                elif val >= 150 and val < 200:
+                    return '../static/img/up4.gif'
+                elif val >= 200:
+                    return '../static/img/up3.gif'
+                elif val == 100:
+                    return ''
+                elif val < 70 and val > 50:
+                    return '../static/img/down2.gif'
+                elif val <= 50 and val > 0:
+                    return '../static/img/down1.gif'
+                else:
+                    return ''
+            else:
+                return ''
+
+
+    def get_diff_arrow(self, val):
+        if val is None or val == '':
+            return ''
+        if val > 0:
+            return '../static/img/up2.gif'
+        elif val < 0:
+            return '../static/img/down2.gif'
+        else:
+            return '../static/img/stop2.gif'
+
     def get_css(self, val):
-        if val is None:
+        if val is None or val == '':
             return ''
         elif val >= 3:
             return 'm3'
@@ -126,23 +192,27 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "ma5_price_avg, ma5_price_avg_chg, " \
               "ma10_price_avg, ma10_price_avg_chg, " \
               "ma10_price_avg_chg_avg, " \
-              "(cldr.day_of_week + 1) day_of_week " \
+              "(cldr.day_of_week + 1) day_of_week, " \
+              "ma3_price_avg_chg_avg_diff, ma5_price_avg_chg_avg_diff, ma10_price_avg_chg_avg_diff," \
+              "ma3_price_avg_chg_avg, ma5_price_avg_chg_avg, ma10amount_flow_chg " \
               "from " \
               "tquant_stock_day_kline kline " \
               "left join " \
-              "( select security_code, the_date, price_avg ma3_price_avg, price_avg_chg ma3_price_avg_chg " \
+              "( select security_code, the_date, price_avg ma3_price_avg, price_avg_chg ma3_price_avg_chg, " \
+              "price_avg_chg_avg_diff ma3_price_avg_chg_avg_diff, price_avg_chg_avg ma3_price_avg_chg_avg " \
               "from tquant_stock_average_line " \
               "where ma = 3 and security_code = {security_code}) ma3 " \
               "on kline.security_code = ma3.security_code and kline.the_date = ma3.the_date " \
               "left join " \
-              "(select security_code, the_date, price_avg ma5_price_avg, price_avg_chg ma5_price_avg_chg " \
+              "(select security_code, the_date, price_avg ma5_price_avg, price_avg_chg ma5_price_avg_chg, " \
+              "price_avg_chg_avg_diff ma5_price_avg_chg_avg_diff, price_avg_chg_avg ma5_price_avg_chg_avg " \
               "from tquant_stock_average_line " \
               "where ma = 5 and security_code = {security_code}) ma5 " \
               "on kline.security_code = ma5.security_code and kline.the_date = ma5.the_date " \
               "left join " \
               "(select security_code, the_date, price_avg ma10_price_avg, price_avg_chg ma10_price_avg_chg, " \
               "price_avg_chg_avg ma10_price_avg_chg_avg, close_ma_price_avg_chg ma10close_ma_price_avg_chg, " \
-              "amount_flow_chg ma10amount_flow_chg " \
+              "amount_flow_chg ma10amount_flow_chg, price_avg_chg_avg_diff ma10_price_avg_chg_avg_diff " \
               "from tquant_stock_average_line " \
               "where ma = 10 and security_code = {security_code}) ma10 " \
               "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
