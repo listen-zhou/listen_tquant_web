@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import calendar
 import os.path
 
 import datetime
@@ -100,11 +100,20 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
                 item_list.append([str(value) + '%', self.get_amount_flow_css(item[12])])
             elif i == 26:
                 item_list.append([self.get_amount_flow_arrow(value, item[12]), ''])
+            elif i == 27:
+                item_list.append([self.get_week_day_num(value), ''])
             else:
                 item_list.append([value, ''])
             i += 1
 
         return item_list
+
+    def get_week_day_num(self, the_date):
+        if the_date is not None:
+            year = the_date.year
+            month = the_date.month
+            day = the_date.day
+            return calendar.weekday(year, month, day) + 1
 
     def get_amount_flow_css(self, price_avg_chg):
         if price_avg_chg is not None:
@@ -192,9 +201,9 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "ma5_price_avg, ma5_price_avg_chg, " \
               "ma10_price_avg, ma10_price_avg_chg, " \
               "ma10_price_avg_chg_avg, " \
-              "(cldr.day_of_week + 1) day_of_week, " \
+              "0, " \
               "ma3_price_avg_chg_avg_diff, ma5_price_avg_chg_avg_diff, ma10_price_avg_chg_avg_diff," \
-              "ma3_price_avg_chg_avg, ma5_price_avg_chg_avg, ma10amount_flow_chg " \
+              "ma3_price_avg_chg_avg, ma5_price_avg_chg_avg, ma10amount_flow_chg, kline.the_date week_day " \
               "from " \
               "tquant_stock_day_kline kline " \
               "left join " \
@@ -216,8 +225,6 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "from tquant_stock_average_line " \
               "where ma = 10 and security_code = {security_code}) ma10 " \
               "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
-              "left join tquant_calendar_info cldr " \
-              "on kline.the_date = cldr.the_date " \
               "where kline.security_code = {security_code} " \
               "order by kline.the_date desc limit {limit} "
         sql = sql.format(security_code=self.quotes_surround(security_code),
