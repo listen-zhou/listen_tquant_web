@@ -1,5 +1,5 @@
 {% for item in table %}
-    <div class="btn-group" style="margin: 1px">
+    <div class="btn-group" style="margin: 1px; width:80px;">
         <button class="btn btn-mini btn-danger" type="button" onclick="security_click(this)" value="{{ item[0] }}">{{ item[1] }}</button>
         <button class="btn btn-mini btn-warning" type="button" onclick="worth_buying_delete(this)" value="{{ item[0] }}" name="{{ item[1] }}">X</button>
     </div>

@@ -170,18 +170,22 @@
         .table{
             font-size: 3px;
         }
+        ::-webkit-scrollbar {
+            width: 0px;
+            height: 10px;
+        }
     </style>
 </head>
     <body>
         <div class="container collapse in" id="worth_buying"></div>
         <div class="container form-horizontal form-inline">
             <input id="security_code" class="form-control form-focus" autofocus type="hidden" placeholder="输入股票代码" style="width: 100px">
-            <label id="security_name"></label>
-            最近<input type="number" class="form-control input-sm" id="limit" value="20" max="1000" min="20" step="5" style="width: 55px">个交易日行情
             <button type="button" class="btn btn-mini btn-info" data-toggle="collapse" data-target="#worth_buying">折叠/展开</button>
             <input id="security_code_add" class="form-control input-sm form-focus" autofocus type="text" placeholder="添加值得买股票代码">
             <button type="button" class="btn btn-mini btn-primary" onclick="worth_buying_add()">添加</button>
             <label id="current_time" style="color:red"></label>
+            最近<input type="number" class="form-control input-sm" id="limit" value="20" max="1000" min="20" step="5" style="width: 55px">个交易日行情
+            <label id="security_name"></label>
         </div>
 
         <div id="deleteModal" class="modal fade">
@@ -191,7 +195,7 @@
                     <input type="hidden" id="delete_security" />
                     <div class="modal-body"><h5>是否真的删除<label id="delete_security_label" style="color: red"></label>？</h5></div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                         <button type="button" class="btn btn-primary" onclick="delete_confirm()">删除</button>
                     </div>
                 </div>
