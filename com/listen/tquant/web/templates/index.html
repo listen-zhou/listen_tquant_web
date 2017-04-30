@@ -61,9 +61,19 @@
             $("#security_code_add").val('');
         }
 
-        function worth_buying_delete(security_code){
+        function worth_buying_delete(obj){
+            $('#deleteModal').modal('toggle', 'center');
+            var security_code = obj.value;
+            var security_name = obj.name;
+            $("#delete_security_label").text("【" + security_code + " " + security_name + "】");
+            $("#delete_security").val(security_code);
+        }
+
+        function delete_confirm(){
             var worth_value = 0;
+            var security_code =$("#delete_security").val();
             worth_buying_put(security_code, worth_value);
+            $('#deleteModal').modal('toggle', 'center');
         }
 
         function worth_buying_put(security_code, worth_value){
@@ -173,6 +183,21 @@
             <button type="button" class="btn btn-mini btn-primary" onclick="worth_buying_add()">添加</button>
             <label id="current_time" style="color:red"></label>
         </div>
+
+        <div id="deleteModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"><h3 class="modal-title">删除确认</h3></div>
+                    <input type="hidden" id="delete_security" />
+                    <div class="modal-body"><h5>是否真的删除<label id="delete_security_label" style="color: red"></label>？</h5></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" onclick="delete_confirm()">删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="container">
             <table class="table table-bordered table-condensed table-auto">
                 <thead>
@@ -183,29 +208,29 @@
                         <td>最低</td>
                         <td>收盘</td>
 
-                        <td>升跌%</td>
+                        <td>升跌</td>
                         <td>收/日均</td>
                         <td>收/10日均</td>
 
-                        <td>交易量(股)</td>
-                        <td>交易额(元)</td>
+                        <td>量(手)</td>
+                        <td>额(万)</td>
                         <td>钱流</td>
                         <td>顶底</td>
                         <td>日均</td>
-                        <td>升跌%</td>
+                        <td>升跌</td>
 
                         <td>3天均</td>
-                        <td>升跌%</td>
+                        <td>升跌</td>
                         <td>升跌均</td>
                         <td>连续</td>
 
                         <td>5天均</td>
-                        <td>升跌%</td>
+                        <td>升跌</td>
                         <td>升跌均</td>
                         <td>连续</td>
 
                         <td>10天均</td>
-                        <td>升跌%</td>
+                        <td>升跌</td>
                         <td>升跌均</td>
                         <td>连续</td>
                         <td>周</td>

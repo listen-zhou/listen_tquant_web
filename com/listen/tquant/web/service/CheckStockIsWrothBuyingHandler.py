@@ -13,6 +13,7 @@ import sys
 from tornado.options import define, options
 
 from com.listen.tquant.web.dbservice.Service import DbService
+from com.listen.tquant.web.utils.Utils import Utils
 
 
 class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
@@ -102,6 +103,10 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
                 item_list.append([self.get_amount_flow_arrow(value, item[12]), ''])
             elif i == 27:
                 item_list.append([self.get_week_day_num(value), ''])
+            elif i == 8:
+                item_list.append([Utils.base_round(Utils.division(value, 100), 2), ''])
+            elif i == 9:
+                item_list.append([Utils.base_round(Utils.division(value, 10000), 2), ''])
             else:
                 item_list.append([value, ''])
             i += 1
