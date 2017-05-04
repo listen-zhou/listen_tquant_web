@@ -29,11 +29,11 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             return_dict['msg'] = '股票代码不能为空'
         else:
             sql = "select count(*) from tquant_security_info where security_code = {security_code}"
-            sql = sql.format(security_code=self.quotes_surround(security_code))
+            sql = sql.format(security_code=Utils.quotes_surround(security_code))
             count = self.dbService.query(sql)[0][0]
             if count == 1:
                 sql = "update tquant_security_info set worth_buying = {worth_value} where security_code = {security_code}"
-                sql = sql.format(security_code=self.quotes_surround(security_code),
+                sql = sql.format(security_code=Utils.quotes_surround(security_code),
                                  worth_value=worth_value)
                 self.dbService.update(sql)
                 return_dict['state'] = True
@@ -94,15 +94,15 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             elif (i >= 5 and i <= 7) or i == 12 \
                     or i == 14 or i == 16 or i == 18 or i == 19 \
                     or (i >= 24 and i <= 25):
-                item_list.append([str(value) + '%', self.get_css(value)])
+                item_list.append([str(value) + '%', Utils.get_css(value)])
             elif i >= 21 and i <= 23:
-                item_list.append([self.get_diff_arrow(value), ''])
+                item_list.append([Utils.get_diff_arrow(value), ''])
             elif i == 10:
-                item_list.append([str(value) + '%', self.get_amount_flow_css(item[12])])
+                item_list.append([str(value) + '%', Utils.get_amount_flow_css(item[12])])
             elif i == 26:
-                item_list.append([self.get_amount_flow_arrow(value, item[12]), ''])
+                item_list.append([Utils.get_amount_flow_arrow(value, item[12]), ''])
             elif i == 27:
-                item_list.append([self.get_week_day_num(value), ''])
+                item_list.append([Utils.get_week_day_num(value), ''])
             elif i == 8:
                 item_list.append([Utils.base_round(Utils.division(value, 100), 2), ''])
             elif i == 9:
@@ -112,90 +112,6 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
             i += 1
 
         return item_list
-
-    def get_week_day_num(self, the_date):
-        if the_date is not None:
-            year = the_date.year
-            month = the_date.month
-            day = the_date.day
-            return calendar.weekday(year, month, day) + 1
-
-    def get_amount_flow_css(self, price_avg_chg):
-        if price_avg_chg is not None:
-            if price_avg_chg >= 0:
-                return 'm0'
-            else:
-                return 'l0'
-        else:
-            return ''
-
-    def get_amount_flow_arrow(self, val, price_avg_chg):
-        if val is not None and price_avg_chg is not None:
-            if price_avg_chg > 0:
-                if val > 100 and val < 150:
-                    return '../static/img/stop2.gif'
-                elif val >= 150 and val < 200:
-                    return '../static/img/up2.gif'
-                elif val >= 200:
-                    return '../static/img/up1.gif'
-                elif val == 100:
-                    return ''
-                elif val < 70 and val > 50:
-                    return '../static/img/down4.gif'
-                elif val <= 50 and val > 0:
-                    return '../static/img/down3.gif'
-                else:
-                    return ''
-            elif price_avg_chg < 0:
-                if val > 100 and val < 150:
-                    return '../static/img/stop3.gif'
-                elif val >= 150 and val < 200:
-                    return '../static/img/up4.gif'
-                elif val >= 200:
-                    return '../static/img/up3.gif'
-                elif val == 100:
-                    return ''
-                elif val < 70 and val > 50:
-                    return '../static/img/down2.gif'
-                elif val <= 50 and val > 0:
-                    return '../static/img/down1.gif'
-                else:
-                    return ''
-            else:
-                return ''
-
-
-    def get_diff_arrow(self, val):
-        if val is None or val == '':
-            return ''
-        if val > 0:
-            return '../static/img/up2.gif'
-        elif val < 0:
-            return '../static/img/down2.gif'
-        else:
-            return '../static/img/stop2.gif'
-
-    def get_css(self, val):
-        if val is None or val == '':
-            return ''
-        elif val >= 3:
-            return 'm3'
-        elif val >= 2:
-            return 'm2'
-        elif val >= 1:
-            return 'm1'
-        elif val > 0:
-            return 'm0'
-        elif val <= -3:
-            return 'l3'
-        elif val <= -2:
-            return 'l2'
-        elif val <= -1:
-            return 'l1'
-        elif val < 0:
-            return 'l0'
-        else:
-            return ''
 
     def get_query_sql(self, security_code, limit=50):
         sql = "select " \
@@ -232,11 +148,6 @@ class CheckStockIsWrothBuyingHandler(tornado.web.RequestHandler):
               "on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date " \
               "where kline.security_code = {security_code} " \
               "order by kline.the_date desc limit {limit} "
-        sql = sql.format(security_code=self.quotes_surround(security_code),
+        sql = sql.format(security_code=Utils.quotes_surround(security_code),
                          limit=limit)
         return sql
-
-    def quotes_surround(self, str):
-        if str is not None:
-            return "'" + str + "'"
-        return str

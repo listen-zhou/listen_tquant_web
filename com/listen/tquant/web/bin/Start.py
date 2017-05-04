@@ -13,6 +13,7 @@ from tornado.options import define, options
 
 from com.listen.tquant.web.service.CheckStockIsWrothBuyingHandler import CheckStockIsWrothBuyingHandler
 from com.listen.tquant.web.service.IndexHandler import IndexHandler
+from com.listen.tquant.web.service.DeviatedChgHandler import DeviatedChgHandler
 
 define('port', default=8000, help='run on the given port', type=int)
 
@@ -23,6 +24,7 @@ class App(tornado.web.Application):
             (r'/average_line', CheckStockIsWrothBuyingHandler),
             (r'/worth_buying', CheckStockIsWrothBuyingHandler),
             (r'/worth_buying_put', CheckStockIsWrothBuyingHandler),
+            (r'/deviated_chg_get', DeviatedChgHandler),
         ]
 
         print(os.path.dirname(__file__))
