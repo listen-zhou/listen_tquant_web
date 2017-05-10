@@ -6,6 +6,11 @@ import os
 import traceback
 import sys
 
+from decimal import Decimal
+
+from com.listen.tquant.web.utils.Utils import Utils
+
+
 class DbService(object):
     def __init__(self):
         # charset必须设置为utf8，而不能为utf-8
@@ -181,4 +186,256 @@ class DbService(object):
               "where worth_buying > 0 " \
               "order by security_code asc "
         tuple_data = self.query(sql)
+        return tuple_data
+
+    def codes_list_keys(self):
+        list_keys = ['security_code', 'security_name']
+        return list_keys
+
+    def get_worth_buying_list_dict_codes(self):
+        tuples_data = self.get_stock_worth_buying()
+        if tuples_data is not None and len(tuples_data) > 0:
+            print('get_stock_worth_buying:', tuples_data)
+            result = self.tuples_to_list_dict(tuples_data, self.codes_list_keys())
+            return result
+        else:
+            return None
+
+    def worth_buying_list_keys(self):
+        list_keys = [
+            'the_date',
+            'amount',
+            'amount_chg',
+            'vol',
+            'open',
+            'open_low_chg',
+            'high',
+            'low',
+            'high_low_chg',
+            'high_close_chg',
+            'close',
+            'close_pre',
+            'close_chg',
+            'close_open_chg',
+            'close_open_chg',
+            'price_avg',
+            'close_price_avg_chg',
+            'price_avg_chg',
+
+            'ma3_close_avg',
+            'ma3_close_avg_chg',
+            'ma3_close_avg_chg_avg',
+            'ma3_close_avg_chg_avg_diff',
+
+            'ma3_amount_avg',
+            'ma3_amount_avg_chg',
+            'ma3_amount_avg_chg_avg',
+            'ma3_amount_avg_chg_avg_diff',
+
+            'ma3_vol_avg',
+            'ma3_vol_avg_chg',
+            'ma3_vol_avg_chg_avg',
+            'ma3_vol_avg_chg_avg_diff',
+
+            'ma3_price_avg',
+            'ma3_price_avg_chg',
+            'ma3_price_avg_chg_avg',
+            'ma3_price_avg_chg_avg_diff',
+
+            'ma3_amount_flow_chg',
+            'ma3_amount_flow_chg_avg',
+            'ma3_amount_flow_chg_avg_diff',
+
+            'ma3_close_ma_price_avg_chg',
+
+            'ma5_close_avg',
+            'ma5_close_avg_chg',
+            'ma5_close_avg_chg_avg',
+            'ma5_close_avg_chg_avg_diff',
+
+            'ma5_amount_avg',
+            'ma5_amount_avg_chg',
+            'ma5_amount_avg_chg_avg',
+            'ma5_amount_avg_chg_avg_diff',
+
+            'ma5_vol_avg',
+            'ma5_vol_avg_chg',
+            'ma5_vol_avg_chg_avg',
+            'ma5_vol_avg_chg_avg_diff',
+
+            'ma5_price_avg',
+            'ma5_price_avg_chg',
+            'ma5_price_avg_chg_avg',
+            'ma5_price_avg_chg_avg_diff',
+
+            'ma5_amount_flow_chg',
+            'ma5_amount_flow_chg_avg',
+            'ma5_amount_flow_chg_avg_diff',
+
+            'ma5_close_ma_price_avg_chg',
+
+            'ma10_close_avg',
+            'ma10_close_avg_chg',
+            'ma10_close_avg_chg_avg',
+            'ma10_close_avg_chg_avg_diff',
+
+            'ma10_amount_avg',
+            'ma10_amount_avg_chg',
+            'ma10_amount_avg_chg_avg',
+            'ma10_amount_avg_chg_avg_diff',
+
+            'ma10_vol_avg',
+            'ma10_vol_avg_chg',
+            'ma10_vol_avg_chg_avg',
+            'ma10_vol_avg_chg_avg_diff',
+
+            'ma10_price_avg',
+            'ma10_price_avg_chg',
+            'ma10_price_avg_chg_avg',
+            'ma10_price_avg_chg_avg_diff',
+
+            'ma10_amount_flow_chg',
+            'ma10_amount_flow_chg_avg',
+            'ma10_amount_flow_chg_avg_diff',
+
+            'ma10_close_ma_price_avg_chg',
+        ]
+        return list_keys
+
+    def tuple_to_dict(self, tuple_data, list_keys):
+        if tuple_data is not None and list_keys is not None and len(tuple_data) == len(list_keys):
+            result = {}
+            i = 0
+            for key in list_keys:
+                result[key] = tuple_data[i]
+                i += 1
+            return result
+        else:
+            return None
+
+    def tuples_to_list_dict(self, tuples_data, list_keys):
+        if tuples_data is not None and len(tuples_data) > 0 and list_keys is not None:
+            result = []
+            for tuple_data in tuples_data:
+                dict_data = self.tuple_to_dict(tuple_data, list_keys)
+                if dict_data is not None:
+                    result.append(dict_data)
+            return result
+        else:
+            return None
+
+    def get_worth_buying_list_dict(self, security_code, size=20):
+        tuples_data = self.get_worth_buying(security_code, size)
+        result = self.tuples_to_list_dict(tuples_data, self.worth_buying_list_keys())
+        return result
+
+
+    def get_worth_buying(self, security_code, size=20):
+        sql = """select 
+                kline.the_date, 
+                kline.amount, 
+                kline.amount_chg, 
+                kline.vol, 
+                kline.open, 
+                kline.open_low_chg, 
+                kline.high, 
+                kline.low, 
+                kline.high_low_chg, 
+                kline.high_close_chg, 
+                kline.close, 
+                kline.close_pre, 
+                kline.close_chg, 
+                kline.close_open_chg, 
+                kline.close_open_chg, 
+                kline.price_avg, 
+                kline.close_price_avg_chg, 
+                kline.price_avg_chg, 
+                
+                ma3.close_avg ma3_close_avg, 
+                ma3.close_avg_chg ma3_close_avg_chg,
+                ma3.close_avg_chg_avg ma3_close_avg_chg_avg, 
+                ma3.close_avg_chg_avg_diff ma3_close_avg_chg_avg_diff, 
+                
+                ma3.amount_avg ma3_amount_avg, 
+                ma3.amount_avg_chg ma3_amount_avg_chg, 
+                ma3.amount_avg_chg_avg ma3_amount_avg_chg_avg, 
+                ma3.amount_avg_chg_avg_diff ma3_amount_avg_chg_avg_diff,
+                
+                ma3.vol_avg ma3_vol_avg, 
+                ma3.vol_avg_chg ma3_vol_avg_chg, 
+                ma3.vol_avg_chg_avg ma3_vol_avg_chg_avg, 
+                ma3.vol_avg_chg_avg_diff ma3_vol_avg_chg_avg_diff, 
+                
+                ma3.price_avg ma3_price_avg, 
+                ma3.price_avg_chg ma3_price_avg_chg, 
+                ma3.price_avg_chg_avg ma3_price_avg_chg_avg, 
+                ma3.price_avg_chg_avg_diff ma3_price_avg_chg_avg_diff, 
+                
+                ma3.amount_flow_chg ma3_amount_flow_chg, 
+                ma3.amount_flow_chg_avg ma3_amount_flow_chg_avg, 
+                ma3.amount_flow_chg_avg_diff ma3_amount_flow_chg_avg_diff, 
+                
+                ma3.close_ma_price_avg_chg ma3_close_ma_price_avg_chg, 
+                
+                ma5.close_avg ma5_close_avg, 
+                ma5.close_avg_chg ma5_close_avg_chg,
+                ma5.close_avg_chg_avg ma5_close_avg_chg_avg, 
+                ma5.close_avg_chg_avg_diff ma5_close_avg_chg_avg_diff, 
+                
+                ma5.amount_avg ma5_amount_avg, 
+                ma5.amount_avg_chg ma5_amount_avg_chg, 
+                ma5.amount_avg_chg_avg ma5_amount_avg_chg_avg, 
+                ma5.amount_avg_chg_avg_diff ma5_amount_avg_chg_avg_diff,
+                
+                ma5.vol_avg ma5_vol_avg, 
+                ma5.vol_avg_chg ma5_vol_avg_chg, 
+                ma5.vol_avg_chg_avg ma5_vol_avg_chg_avg, 
+                ma5.vol_avg_chg_avg_diff ma5_vol_avg_chg_avg_diff, 
+                
+                ma5.price_avg ma5_price_avg, 
+                ma5.price_avg_chg ma5_price_avg_chg, 
+                ma5.price_avg_chg_avg ma5_price_avg_chg_avg, 
+                ma5.price_avg_chg_avg_diff ma5_price_avg_chg_avg_diff, 
+                
+                ma5.amount_flow_chg ma5_amount_flow_chg, 
+                ma5.amount_flow_chg_avg ma5_amount_flow_chg_avg, 
+                ma5.amount_flow_chg_avg_diff ma5_amount_flow_chg_avg_diff, 
+                
+                ma5.close_ma_price_avg_chg ma5_close_ma_price_avg_chg, 
+                
+                ma10.close_avg ma10_close_avg, 
+                ma10.close_avg_chg ma10_close_avg_chg,
+                ma10.close_avg_chg_avg ma10_close_avg_chg_avg, 
+                ma10.close_avg_chg_avg_diff ma10_close_avg_chg_avg_diff, 
+                
+                ma10.amount_avg ma10_amount_avg, 
+                ma10.amount_avg_chg ma10_amount_avg_chg, 
+                ma10.amount_avg_chg_avg ma10_amount_avg_chg_avg, 
+                ma10.amount_avg_chg_avg_diff ma10_amount_avg_chg_avg_diff,
+                
+                ma10.vol_avg ma10_vol_avg, 
+                ma10.vol_avg_chg ma10_vol_avg_chg, 
+                ma10.vol_avg_chg_avg ma10_vol_avg_chg_avg, 
+                ma10.vol_avg_chg_avg_diff ma10_vol_avg_chg_avg_diff, 
+                
+                ma10.price_avg ma10_price_avg, 
+                ma10.price_avg_chg ma10_price_avg_chg, 
+                ma10.price_avg_chg_avg ma10_price_avg_chg_avg, 
+                ma10.price_avg_chg_avg_diff ma10_price_avg_chg_avg_diff, 
+                
+                ma10.amount_flow_chg ma10_amount_flow_chg, 
+                ma10.amount_flow_chg_avg ma10_amount_flow_chg_avg, 
+                ma10.amount_flow_chg_avg_diff ma10_amount_flow_chg_avg_diff, 
+                
+                ma10.close_ma_price_avg_chg ma10_close_ma_price_avg_chg 
+                
+                from tquant_stock_day_kline kline 
+                left join tquant_stock_average_line ma3 on kline.security_code = ma3.security_code and kline.the_date = ma3.the_date and ma3.ma = 3
+                left join tquant_stock_average_line ma5 on kline.security_code = ma5.security_code and kline.the_date = ma5.the_date and ma5.ma = 5
+                left join tquant_stock_average_line ma10 on kline.security_code = ma10.security_code and kline.the_date = ma10.the_date and ma10.ma = 10
+                where kline.security_code = {security_code}
+                order by kline.the_date desc limit {size}
+                
+                """
+        tuple_data = self.query(sql.format(security_code=Utils.quotes_surround(security_code), size=size))
         return tuple_data

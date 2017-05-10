@@ -15,6 +15,8 @@ from com.listen.tquant.web.service.CheckStockIsWrothBuyingHandler import CheckSt
 from com.listen.tquant.web.service.IndexHandler import IndexHandler
 from com.listen.tquant.web.service.DeviatedChgHandler import DeviatedChgHandler
 
+from com.listen.tquant.web.service.WorthBuyingHandler import WorthBuyingHandler
+
 define('port', default=8000, help='run on the given port', type=int)
 
 class App(tornado.web.Application):
@@ -25,6 +27,8 @@ class App(tornado.web.Application):
             (r'/worth_buying', CheckStockIsWrothBuyingHandler),
             (r'/worth_buying_put', CheckStockIsWrothBuyingHandler),
             (r'/deviated_chg_get', DeviatedChgHandler),
+            (r'/worth_buying_post', WorthBuyingHandler),
+            (r'/worth_buying_get', WorthBuyingHandler),
         ]
 
         print(os.path.dirname(__file__))

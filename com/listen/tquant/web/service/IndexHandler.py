@@ -17,5 +17,5 @@ class IndexHandler(tornado.web.RequestHandler):
 
     def get(self):
         dbService = DbService()
-        self.render('index.html')
+        self.render('index_easyui.html')
 
