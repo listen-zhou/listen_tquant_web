@@ -16,6 +16,7 @@ from com.listen.tquant.web.service.IndexHandler import IndexHandler
 from com.listen.tquant.web.service.DeviatedChgHandler import DeviatedChgHandler
 
 from com.listen.tquant.web.service.WorthBuyingHandler import WorthBuyingHandler
+from com.listen.tquant.web.service.InflectionPointHandler import InflectionPointHandler
 
 define('port', default=8000, help='run on the given port', type=int)
 
@@ -29,6 +30,7 @@ class App(tornado.web.Application):
             (r'/deviated_chg_get', DeviatedChgHandler),
             (r'/worth_buying_post', WorthBuyingHandler),
             (r'/worth_buying_get', WorthBuyingHandler),
+            (r'/inflection_point_post', InflectionPointHandler),
         ]
 
         print(os.path.dirname(__file__))

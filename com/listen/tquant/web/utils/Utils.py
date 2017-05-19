@@ -192,3 +192,33 @@ class Utils():
         if isinstance(val, datetime.date):
             return val.strftime('%m-%d')
         return val
+
+    @staticmethod
+    def format_mm_dd(val):
+        if val is not None and isinstance(val, datetime.date):
+            return val.strftime('%m-%d')
+        return val
+
+    @staticmethod
+    def tuple_to_dict(tuple_data, list_keys):
+        if tuple_data is not None and list_keys is not None and len(tuple_data) == len(list_keys):
+            result = {}
+            i = 0
+            for key in list_keys:
+                result[key] = tuple_data[i]
+                i += 1
+            return result
+        else:
+            return None
+
+    @staticmethod
+    def tuples_to_dicts(tuple_datas, list_keys):
+        if tuple_datas is not None and len(tuple_datas) > 0 and list_keys is not None:
+            result = []
+            for tuple_data in tuple_datas:
+                dict_data = Utils.tuple_to_dict(tuple_data, list_keys)
+                if dict_data is not None:
+                    result.append(dict_data)
+            return result
+        else:
+            return None
