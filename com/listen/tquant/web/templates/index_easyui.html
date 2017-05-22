@@ -10,13 +10,9 @@
 	<script type="text/javascript">
 
 		$(function(){
-			//worth_buying_codes_reload();
 			//interval_codes_reload = window.setInterval("worth_buying_codes_reload()", 50000);
 
-			//worth_buying_grid_reload();
-			//interval_grid_reload = window.setInterval("worth_buying_grid_reload()", 50000);
-
-            inflection_point_grid_reload();
+			query_all_stockinfo();
 		});
 		function cellStyler(value,row,index){
 			if (value > 2){
@@ -96,148 +92,148 @@
 			return '' + val+'%';
 		}
 
-		function worth_buying_codes_reload(){
-			var url = '/worth_buying_get';
+		function inflection_point_grid_reload(){
+		    $('#inflection_point_grid').datagrid('reload');
+		}
+
+		function inflection_changesize(size){
+			var security_code = $("#inflection_security_code").val();
+			if(security_code == '' || security_code == undefined){
+				$.messager.alert('警告', '请先单击一个股票', 'warning');
+				return;
+			}
+			$("#inflection_size").val(size);
+			inflection_point_grid_query();
+		}
+
+		function inflection_security_click(obj){
+			console.log(obj);
+			$("#inflection_security_code").val(obj.value);
+			inflection_point_grid_query();
+			$("#show_stock_info").html("【"+obj.value + " " + obj.name +"】");
+		}
+
+		function inflection_point_grid_query(){
+			var security_code = $("#inflection_security_code").val();
+			var size = $("#inflection_size").val();
+			console.log(security_code);
+			$("#inflection_point_grid").datagrid({
+				queryParams: {
+					security_code: security_code,
+					size: size
+				}
+			});
+		}
+
+		function query_all_stockinfo(){
+			var url = '/inflection_point_get';
             $.ajax({
                 url: url,
                 type: 'get',
                 data: {},
                 dataType: 'json',
                 success: function(data){
-                    $('#worth_buying_codes').html('');
+                	data = data['row'];
                     $.each(data, function(i, obj){
-                    	$('#worth_buying_codes').append('<button type="button" style="width: 80px;" onclick="worth_buying_grid_click(this)" value="'+obj.security_code+'" name="'+obj.security_name+'">'+obj.security_name+'</button>');
-                    });
-                    console.log('worth_buying_codes_reload ' + new Date());
+						$('#inflection_stock_codes').append('<button type="button" style="width: 70px;" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+obj.security_code+'" title="'+obj.security_code+'" name="'+obj.security_name+'">'+obj.security_name+'</button>');
+					});
+					$.parser.parse($('#inflection_stock_codes'));
+					console.log('inflection_stock_codes ' + new Date());
                 }
             });
-		}
-
-		function worth_buying_grid_click(obj){
-			$("#worth_buying_grid").datagrid({
-				queryParams: {
-					security_code: obj.value,
-					size: $("#size").val()
-				}
-			});
-			console.log(obj)
-			$("#label_security_code").text(obj.value);
-			$("#label_security_name").text(obj.name);
-			$('#label_current_time').text(new Date().toLocaleString());
-		}
-
-		function worth_buying_grid_reload(){
-			$('#worth_buying_grid').datagrid('reload');
-		}
-
-		function inflection_point_grid_reload(){
-		    $('#inflection_point_grid').datagrid('reload');
 		}
 
 	</script>
 </head>
 <body>
-	<div class="easyui-tabs" style="width:90%; height:auto; align: center">
-		<div title="值得买" style="padding:10px">
-			<div id="worth_buying_codes"></div>
-			<div class="container form-horizontal form-inline">
-				<input id="security_code_add">
-				<button type="button" onclick="worth_buying_add()">添加</button>
-				<label id="label_current_time" style="color:red"></label>
-				最近<input id="size" class="easyui-numberspinner" value="20" style="width: 50px;" required="required" data-options="min:20,max:200,editable:false, increment: 5">个交易日行情
-				<label id="label_security_code" style="color: red"></label>
-				<label id="label_security_name" style="color: red"></label>
-			</div>
-			<table id="worth_buying_grid" class="easyui-datagrid" title="值得买" style="width:100%; height:600px;"
-					data-options="remoteSort:false, rownumbers:true, singleSelect:true, iconCls:'icon-ok', url:'/worth_buying_post', method:'post'">
-				<thead>
-					<tr>
-						<!--
-						<th data-options="field:'itemid', width:80, sortable:true">Item ID</th>
-						<th data-options="field:'listprice', width:80, align:'right', formatter:formatPrice">List Price</th>
-						<th data-options="field:'unitcost', width:80, align:'right', styler:cellStyler">Unit Cost</th>
-						<th data-options="field:'status', width:60, align:'center'">Status</th>
-						-->
-						<th data-options="field:'the_date', sortable:true">交易日</th>
-						<th data-options="field:'amount', sortable:true, align:'center', styler:cellStyler">成交额</th>
-					</tr>
-				</thead>
-			</table>
-		</div>
-		<div title="振幅榜" style="padding:10px">
-
-		</div>
+	<div class="easyui-tabs" style="width: 100%; height: 750px; align: center">
 		<div title="分析拐点" id="inflection_point">
-            <table id="inflection_point_grid" class="easyui-datagrid" title="分析拐点" style="width:100%; height:600px;"
-					data-options="remoteSort:false, rownumbers:true, singleSelect:true, iconCls:'icon-ok', url:'/inflection_point_post', method:'post'">
-				<thead>
-					<tr>
-						<!--
-						<th data-options="field:'itemid', width:80, sortable:true">Item ID</th>
-						<th data-options="field:'listprice', width:80, align:'right', formatter:formatPrice">List Price</th>
-						<th data-options="field:'unitcost', width:80, align:'right', styler:cellStyler">Unit Cost</th>
-						<th data-options="field:'status', width:60, align:'center'">Status</th>
-                        `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-                        `security_code` VARCHAR(20) NOT NULL COMMENT '股票代码',
-                        `the_date` DATE NOT NULL COMMENT '交易日',
+			<div class="easyui-layout" style="width: 100%; height: 100%">
+				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 42%;"></div>
+				<div data-options="region: 'center', split: true" title="Center">
+					<div id="inflection_tools">
+						<label id="show_stock_info" style="width: 20px;"></label>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(30)">近30日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(40)">近40日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(50)">近50日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(70)">近70日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(100)">近100日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(150)">近150日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)">近200日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(250)">近250日</a>
+					</div>
+					<input type="hidden" id="inflection_security_code">
+					<input type="hidden" id="inflection_size" value="20">
+					<table id="inflection_point_grid" class="easyui-datagrid" title="分析拐点" style="width: 100%; height: 100%;"
+							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
+							url:'/inflection_point_post', method:'post', toolbar:'#inflection_tools'">
+						<thead>
+							<tr>
+								<!--
+								`security_code` VARCHAR(20) NOT NULL COMMENT '股票代码',
+								`the_date` DATE NOT NULL COMMENT '交易日',
 
-                        `amount` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额(元)',
-                        `amount_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易额(元)',
-                        `amount_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额涨跌幅',
+								`amount` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额(元)',
+								`amount_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易额(元)',
+								`amount_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额涨跌幅',
 
-                        `vol` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量(手)',
-                        `vol_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易量(手)',
-                        `vol_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量涨跌幅',
+								`vol` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量(手)',
+								`vol_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易量(手)',
+								`vol_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量涨跌幅',
 
-                        `open` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价',
-                        `open_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价与最低价偏离幅度',
+								`open` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价',
+								`open_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价与最低价偏离幅度',
 
-                        `high` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价',
-                        `low` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最低价',
-                        `high_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与最低价偏离幅度',
-                        `high_close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与收盘价偏离幅度',
+								`high` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价',
+								`low` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最低价',
+								`high_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与最低价偏离幅度',
+								`high_close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与收盘价偏离幅度',
 
-                        `close` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价',
-                        `close_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日收盘价',
-                        `close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价涨跌幅',
-                        `close_open_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价与开盘价偏离幅度',
+								`close` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价',
+								`close_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日收盘价',
+								`close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价涨跌幅',
+								`close_open_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价与开盘价偏离幅度',
 
-                        `price_avg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价',
-                        `close_price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘/日均价百分比',
-                        `price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价涨跌幅百分比',
-						-->
-						<th data-options="field:'the_date'">交易日</th>
-                        <!--
-                        <th data-options="field:'amount_pre', align:'center'">成交额-前</th>
-                        -->
-                        <th data-options="field:'amount', align:'center'">额</th>
-                        <th data-options="field:'amount_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">额-幅</b></th>
+								`price_avg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价',
+								`close_price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘/日均价百分比',
+								`price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价涨跌幅百分比',
+								-->
+								<th data-options="field:'the_date'">交易日</th>
+								<!--
+								<th data-options="field:'amount_pre', align:'center'">成交额-前</th>
+								-->
+								<th data-options="field:'amount', align:'center'">额</th>
+								<th data-options="field:'amount_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">额-幅</b></th>
 
-                        <!--
-                        <th data-options="field:'vol_pre', align:'center'">成交量-前</th>
-                        -->
+								<!--
+								<th data-options="field:'vol_pre', align:'center'">成交量-前</th>
+								-->
 
-                        <th data-options="field:'vol', align:'center'">量</th>
-                        <th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量-幅</b></th>
+								<th data-options="field:'vol', align:'center'">量</th>
+								<th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量-幅</b></th>
 
-                        <th data-options="field:'open', align:'center', styler:cellCloseStyler">开</th>
-                        <th data-options="field:'high', align:'center', styler:cellCloseStyler">高</th>
-                        <th data-options="field:'low', align:'center', styler:cellCloseStyler">低</th>
-                        <th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
-                        <th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
-                        <th data-options="field:'open_low_chg', align:'center', styler:cellShortStyler, formatter:formatPercent">开-低-幅</th>
+								<th data-options="field:'open', align:'center', styler:cellCloseStyler">开</th>
+								<th data-options="field:'high', align:'center', styler:cellCloseStyler">高</th>
+								<th data-options="field:'low', align:'center', styler:cellCloseStyler">低</th>
+								<th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
+								<th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
+								<th data-options="field:'open_low_chg', align:'center', styler:cellShortStyler, formatter:formatPercent">开-低-幅</th>
 
-                        <th data-options="field:'high_low_chg', align:'center', styler:cellLongStyler, formatter:formatPercent">高-低-幅</th>
-                        <th data-options="field:'high_close_chg', align:'center', styler:cellShortStyler, formatter:formatPercent">高-收-幅</th>
+								<th data-options="field:'high_low_chg', align:'center', styler:cellLongStyler, formatter:formatPercent">高-低-幅</th>
+								<th data-options="field:'high_close_chg', align:'center', styler:cellShortStyler, formatter:formatPercent">高-收-幅</th>
 
-                        <th data-options="field:'close_open_chg', align:'center', styler:cellCloseStyler, formatter:formatPercent">收-开-幅</th>
+								<th data-options="field:'close_open_chg', align:'center', styler:cellCloseStyler, formatter:formatPercent">收-开-幅</th>
 
-                        <th data-options="field:'price_avg', align:'center', styler:cellDayAvgPriceStyler">日均</th>
-                        <th data-options="field:'price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">日均-幅</th>
-                        <th data-options="field:'close_price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">收-日均-幅</th>
-					</tr>
-				</thead>
-			</table>
+								<th data-options="field:'price_avg', align:'center', styler:cellDayAvgPriceStyler">日均</th>
+								<th data-options="field:'price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">日均-幅</th>
+								<th data-options="field:'close_price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">收-日均-幅</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </body>

@@ -31,6 +31,7 @@ class App(tornado.web.Application):
             (r'/worth_buying_post', WorthBuyingHandler),
             (r'/worth_buying_get', WorthBuyingHandler),
             (r'/inflection_point_post', InflectionPointHandler),
+            (r'/inflection_point_get', InflectionPointHandler),
         ]
 
         print(os.path.dirname(__file__))

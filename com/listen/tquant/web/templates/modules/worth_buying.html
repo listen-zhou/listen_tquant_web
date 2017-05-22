@@ -1,6 +1,67 @@
-{% for item in table %}
-    <div class="btn-group" style="margin: 1px; width:80px;">
-        <button class="btn btn-mini btn-danger" type="button" onclick="security_click(this)" value="{{ item[0] }}">{{ item[1] }}</button>
-        <button class="btn btn-mini btn-warning" type="button" onclick="worth_buying_delete(this)" value="{{ item[0] }}" name="{{ item[1] }}">X</button>
-    </div>
-{% end %}
+<div title="值得买" style="padding:10px">
+			<div id="worth_buying_codes"></div>
+			<div class="container form-horizontal form-inline">
+				<input id="security_code_add">
+				<button type="button" onclick="worth_buying_add()">添加</button>
+				<label id="label_current_time" style="color:red"></label>
+				最近<input id="size" class="easyui-numberspinner" value="20" style="width: 50px;" required="required" data-options="min:20,max:200,editable:false, increment: 5">个交易日行情
+				<label id="label_security_code" style="color: red"></label>
+				<label id="label_security_name" style="color: red"></label>
+			</div>
+			<table id="worth_buying_grid" class="easyui-datagrid" title="值得买" style="width:100%; height:600px;"
+					data-options="remoteSort:false, rownumbers:true, singleSelect:true, iconCls:'icon-ok', url:'/worth_buying_post', method:'post'">
+				<thead>
+					<tr>
+						<!--
+						<th data-options="field:'itemid', width:80, sortable:true">Item ID</th>
+						<th data-options="field:'listprice', width:80, align:'right', formatter:formatPrice">List Price</th>
+						<th data-options="field:'unitcost', width:80, align:'right', styler:cellStyler">Unit Cost</th>
+						<th data-options="field:'status', width:60, align:'center'">Status</th>
+						-->
+						<th data-options="field:'the_date', sortable:true">交易日</th>
+						<th data-options="field:'amount', sortable:true, align:'center', styler:cellStyler">成交额</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div title="振幅榜" style="padding:10px">
+
+        </div>
+
+<script>
+
+
+		function worth_buying_codes_reload(){
+			var url = '/worth_buying_get';
+            $.ajax({
+                url: url,
+                type: 'get',
+                data: {},
+                dataType: 'json',
+                success: function(data){
+                    $('#worth_buying_codes').html('');
+                    $.each(data, function(i, obj){
+                    	$('#worth_buying_codes').append('<button type="button" style="width: 80px;" onclick="worth_buying_grid_click(this)" value="'+obj.security_code+'" name="'+obj.security_name+'">'+obj.security_name+'</button>');
+                    });
+                    console.log('worth_buying_codes_reload ' + new Date());
+                }
+            });
+		}
+
+		function worth_buying_grid_click(obj){
+			$("#worth_buying_grid").datagrid({
+				queryParams: {
+					security_code: obj.value,
+					size: $("#size").val()
+				}
+			});
+			console.log(obj)
+			$("#label_security_code").text(obj.value);
+			$("#label_security_name").text(obj.name);
+			$('#label_current_time').text(new Date().toLocaleString());
+		}
+
+		function worth_buying_grid_reload(){
+			$('#worth_buying_grid').datagrid('reload');
+		}
+</script>
