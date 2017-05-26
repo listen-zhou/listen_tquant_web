@@ -11,11 +11,12 @@ class InflectionPointHandler(RequestHandler):
     dbService = DbService()
 
     def post(self):
-        security_code = self.get_argument('security_code')
+        security_code = self.get_argument('security_code', None)
         size = self.get_argument('size', 20)
         if security_code is not None:
             result = self.get_stock_day_kline(security_code, size)
             result = Utils.tuples_to_dicts(result, self.get_day_kline_list_keys())
+            # result = InflectionPointHandler.get_trans_result(result, 'price_avg_chg_10_avg_diff')
             result = {"rows": result}
             result_json = simplejson.dumps(result, default=Utils.json_default)
             print('get_stock_day_kline result: ', result_json)
@@ -26,13 +27,75 @@ class InflectionPointHandler(RequestHandler):
     @staticmethod
     def get_day_kline_list_keys():
         list_keys = ['the_date',
-                     'amount', 'amount_pre', 'amount_chg',
-                     'vol', 'vol_pre', 'vol_chg',
-                     'open', 'open_low_chg',
-                     'high', 'low', 'high_low_chg', 'high_close_chg',
-                     'close', 'close_pre', 'close_chg', 'close_open_chg',
-                     'price_avg', 'close_price_avg_chg', 'price_avg_chg']
+                     'amount',
+                     'vol', 'open', 'high', 'low', 'close',
+                     'vol_chg', 'close_chg', 'close_open_chg',
+                     'price_avg', 'price_avg_chg', 'close_price_avg_chg',
+                     'price_avg_3', 'price_avg_chg_3',
+                     'price_avg_5', 'price_avg_chg_5',
+                     'price_avg_10', 'price_avg_chg_10', 'close_10_price_avg_chg',
+                     'price_avg_chg_10_avg', 'price_avg_chg_10_avg_diff', 'money_flow'
+                     ]
         return list_keys
+
+    @staticmethod
+    def get_trans_result(result, key):
+        if result is not None and len(result) > 0:
+            for i in range(len(result)):
+                result[i][key] = InflectionPointHandler.get_diff_up_down_img(result[i][key])
+        return result
+
+    @staticmethod
+    def get_amount_flow_arrow(val, price_avg_chg):
+        if val is not None and price_avg_chg is not None:
+            if price_avg_chg > 0:
+                if val > 100 and val < 150:
+                    return '../static/img/stop2.gif'
+                elif val >= 150 and val < 200:
+                    return '../static/img/up2.gif'
+                elif val >= 200:
+                    return '../static/img/up1.gif'
+                elif val == 100:
+                    return ''
+                elif val < 70 and val > 50:
+                    return '../static/img/down4.gif'
+                elif val <= 50 and val > 0:
+                    return '../static/img/down3.gif'
+                else:
+                    return ''
+            elif price_avg_chg < 0:
+                if val > 100 and val < 150:
+                    return '../static/img/stop3.gif'
+                elif val >= 150 and val < 200:
+                    return '../static/img/up4.gif'
+                elif val >= 200:
+                    return '../static/img/up3.gif'
+                elif val == 100:
+                    return ''
+                elif val < 70 and val > 50:
+                    return '../static/img/down2.gif'
+                elif val <= 50 and val > 0:
+                    return '../static/img/down1.gif'
+                else:
+                    return ''
+            else:
+                return ''
+
+    @staticmethod
+    def get_diff_up_down_img(val):
+        if val is None or val == '':
+            return ''
+        if val >= 1:
+            return '../static/img/up1.gif'
+        elif val > 0:
+            return '../static/img/up2.gif'
+        elif val == 0:
+            return '../static/img/stop2.gif'
+        elif val <= -1:
+            return '../static/img/down1.gif'
+        elif val < 0:
+            return '../static/img/down2.gif'
+
 
     def get_all_stock_info(self):
         sql = "select security_code, security_name from tquant_security_info order by security_code asc "
@@ -55,38 +118,27 @@ class InflectionPointHandler(RequestHandler):
     def get_stock_day_kline(self, security_code, size=20):
         if security_code is not None:
             """
-            `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-            `security_code` VARCHAR(20) NOT NULL COMMENT '股票代码',
-            `the_date` DATE NOT NULL COMMENT '交易日',
-            `amount` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额(元)',
-            `amount_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易额(元)',
-            `amount_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易额涨跌幅',
-            `vol` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量(手)',
-            `vol_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日交易量(手)',
-            `vol_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '交易量涨跌幅',
-            `open` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价',
-            `open_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '开盘价与最低价偏离幅度',
-            `high` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价',
-            `low` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最低价',
-            `high_low_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与最低价偏离幅度',
-            `high_close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '最高价与收盘价偏离幅度',
-            `close` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价',
-            `close_pre` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '前一日收盘价',
-            `close_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价涨跌幅',
-            `close_open_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘价与开盘价偏离幅度',
-            `price_avg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价',
-            `close_price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '收盘/日均价百分比',
-            `price_avg_chg` DECIMAL(20,2) NULL DEFAULT NULL COMMENT '日均价涨跌幅百分比',
-                    """
+            'the_date',
+                     'amount',
+                     'vol', 'open', 'high', 'low', 'close',
+                     'vol_chg', 'close_chg', 'close_open_chg',
+                     'price_avg', 'price_avg_chg', 'close_price_avg_chg',
+                     'price_avg_3', 'price_avg_chg_3',
+                     'price_avg_5', 'price_avg_chg_5',
+                     'price_avg_10', 'price_avg_chg_10', 'close_10_price_avg_chg',
+                     'price_avg_chg_10_avg', 'price_avg_chg_10_avg_diff', 'money_flow'
+            """
             sql = "select " \
                   "the_date, " \
-                  "amount, amount_pre, amount_chg, " \
-                  "vol, vol_pre, vol_chg, " \
-                  "open, open_low_chg, " \
-                  "high, low, high_low_chg, high_close_chg, " \
-                  "close, close_pre, close_chg, close_open_chg, " \
-                  "price_avg, close_price_avg_chg, price_avg_chg " \
-                  "from tquant_stock_day_kline " \
+                  "amount, " \
+                  "vol, open, high, low, close, " \
+                  "vol_chg, close_chg, close_open_chg, " \
+                  "price_avg, price_avg_chg, close_price_avg_chg, " \
+                  "price_avg_3, price_avg_chg_3, " \
+                  "price_avg_5, price_avg_chg_5, " \
+                  "price_avg_10, price_avg_chg_10, close_10_price_avg_chg, " \
+                  "price_avg_chg_10_avg, price_avg_chg_10_avg_diff, money_flow " \
+                  "from tquant_stock_history_quotation " \
                   "where security_code = {security_code} " \
                   "order by the_date desc " \
                   "limit {size}"
