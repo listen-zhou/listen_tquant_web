@@ -1,6 +1,6 @@
 //收盘价涨跌幅背景色处理
 function cellStyler(value,row,index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if (value >= 3){
@@ -21,7 +21,7 @@ function cellStyler(value,row,index){
 }
 //成交量涨跌幅背景色处理
 function cellVolStyler(value,row,index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if (value >= 50){
@@ -42,7 +42,7 @@ function cellVolStyler(value,row,index){
 }
 //钱流背景色处理
 function cellMoneyFlowStyler(value,row,index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if (value >= 130){
@@ -64,7 +64,7 @@ function cellMoneyFlowStyler(value,row,index){
 //根据收盘价涨跌幅设置收盘价的背景色
 function cellCloseStyler(value,row,index){
     chg = row['close_chg'];
-    if (chg == '' || chg == undefined || chg == 'null'){
+    if (chg == null){
         return ''
     }
     if (chg >= 3){
@@ -85,7 +85,7 @@ function cellCloseStyler(value,row,index){
 }
 //收盘价/开盘价涨跌幅背景色
 function cellCloseOpenStyler(value,row,index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if (value >= 3){
@@ -107,7 +107,7 @@ function cellCloseOpenStyler(value,row,index){
 //根据日均价涨跌幅设置日均价的背景色
 function cellDayAvgPriceStyler(value,row,index){
     chg = row['price_avg_chg'];
-    if (chg == '' || chg == undefined || chg == 'null'){
+    if (chg == null){
         return ''
     }
     else if (chg >= 3){
@@ -129,7 +129,7 @@ function cellDayAvgPriceStyler(value,row,index){
 //根据3日均价涨跌幅设置3日均价的背景色
 function cellDayAvgPrice3Styler(value,row,index){
     chg = row['price_avg_chg_3'];
-    if (chg == '' || chg == undefined || chg == 'null'){
+    if (chg == null){
         return ''
     }
     else if (chg >= 3){
@@ -151,7 +151,7 @@ function cellDayAvgPrice3Styler(value,row,index){
 //根据5日均价涨跌幅设置5日均价的背景色
 function cellDayAvgPrice5Styler(value,row,index){
     chg = row['price_avg_chg_5'];
-    if (chg == '' || chg == undefined || chg == 'null'){
+    if (chg == null){
         return ''
     }
     else if (chg >= 3){
@@ -173,7 +173,7 @@ function cellDayAvgPrice5Styler(value,row,index){
 //根据10日均价涨跌幅设置10日均价的背景色
 function cellDayAvgPrice10Styler(value,row,index){
     chg = row['price_avg_chg_10'];
-    if (chg == '' || chg == undefined || chg == 'null'){
+    if (chg == null){
         return ''
     }
     else if (chg >= 3){
@@ -194,7 +194,7 @@ function cellDayAvgPrice10Styler(value,row,index){
 }
 //根据10日均价涨跌幅平均值背景色，即1%的规律
 function cellPercent1Styler(value, row, index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if(value >= 1){
@@ -212,7 +212,7 @@ function cellPercent1Styler(value, row, index){
 }
 //(1,3,5,10)日均涨跌幅背景色
 function cellDayAvgStyler(value,row,index){
-    if (value == '' || value == undefined || value == 'null'){
+    if (value == null){
         return ''
     }
     else if (value >= 1){
@@ -241,7 +241,7 @@ function formatPercent(val,row){
     }
 }
 function get_diff_up_down_img(val){
-    if (val == '' || val == undefined || val == 'null'){
+    if (val == null){
         return ''
     }
     else if (val >= 1){
