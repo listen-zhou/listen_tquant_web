@@ -318,5 +318,5 @@ function query_all_stockinfo(){
 }
 
 function formatToButton(val,row){
-    return '<button type="button" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+row.security_code+'" title="'+row.security_code+'" name="'+row.security_name+'">'+row.security_code+'</button>'
+    return '<button type="button" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+row.security_code+'" title="'+row.security_name+'" name="'+row.security_name+'">'+row.security_code+'</button>'
 }
