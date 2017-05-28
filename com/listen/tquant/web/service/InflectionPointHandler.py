@@ -11,7 +11,7 @@ class InflectionPointHandler(RequestHandler):
     dbService = DbService()
 
     def post(self):
-        security_code = self.get_argument('security_code', None)
+        security_code = self.get_argument('security_code', '000001')
         size = self.get_argument('size', 20)
         if security_code is not None:
             result = self.get_stock_day_kline(security_code, size)
@@ -98,7 +98,10 @@ class InflectionPointHandler(RequestHandler):
 
 
     def get_all_stock_info(self):
-        sql = "select security_code, security_name from tquant_security_info order by security_code asc "
+        sql = "select security_code, security_name " \
+              "from tquant_security_info " \
+              "where worth_buying = 1 " \
+              "order by security_code asc "
         result = self.dbService.query(sql)
         return result
 
@@ -110,7 +113,7 @@ class InflectionPointHandler(RequestHandler):
     def get(self):
         result = self.get_all_stock_info()
         result = Utils.tuples_to_dicts(result, self.get_stock_info_list_keys())
-        result = {'row': result}
+        result = {'rows': result}
         result_json = simplejson.dumps(result, default=Utils.json_default)
         print('get_all_stock_info result: ', result_json)
         self.write(result_json)

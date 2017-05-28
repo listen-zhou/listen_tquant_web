@@ -12,7 +12,7 @@
 
 		$(function(){
 			//interval_codes_reload = window.setInterval("worth_buying_codes_reload()", 50000);
-			query_all_stockinfo();
+			//query_all_stockinfo();
 		});
 
 	</script>
@@ -21,7 +21,19 @@
 	<div class="easyui-tabs" style="width: 100%; height: 750px; align: center">
 		<div title="分析拐点" id="inflection_point">
 			<div class="easyui-layout" style="width: 100%; height: 100%">
-				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 20%;"></div>
+				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 14%;">
+					<table class="easyui-datagrid" title="筛选股票" style="width: 100%; height: 100%;"
+							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
+							url:'/inflection_point_get', method:'get'">
+						<thead>
+							<tr>
+								<th data-options="field:'security_code', align:'center', formatter:formatToButton">股票代码</th>
+								<th data-options="field:'security_name', align:'center'">股票名称</th>
+							</tr>
+						</thead>
+					</table>
+
+				</div>
 				<div data-options="region: 'center', split: true" title="Center">
 					<div id="inflection_tools">
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
