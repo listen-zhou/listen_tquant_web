@@ -11,7 +11,7 @@ class InflectionPointHandler(RequestHandler):
     dbService = DbService()
 
     def post(self):
-        security_code = self.get_argument('security_code', '000001')
+        security_code = self.get_argument('security_code', None)
         size = self.get_argument('size', 20)
         if security_code is not None:
             result = self.get_stock_day_kline(security_code, size)
