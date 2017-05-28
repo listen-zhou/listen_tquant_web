@@ -21,7 +21,7 @@
 	<div class="easyui-tabs" style="width: 100%; height: 635px; align: center">
 		<div title="分析拐点" id="inflection_point">
 			<div class="easyui-layout" style="width: 100%; height: 100%">
-				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 13%;">
+				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 11%;">
 					<table class="easyui-datagrid" title="筛选股票" style="width: 100%; height: 100%;"
 							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
 							url:'/inflection_point_get', method:'get'">
@@ -72,7 +72,7 @@
 								<th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
 								<th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
 								<th data-options="field:'close_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/日均幅</th>
-								<th data-options="field:'close_10_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10日均幅</th>
+								<th data-options="field:'close_10_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
 								<th data-options="field:'close_open_chg', align:'center', styler:cellCloseOpenStyler, formatter:formatPercent">收/开幅</th>
 
 								<th data-options="field:'vol', align:'center'">量(股)</th>
