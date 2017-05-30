@@ -281,22 +281,22 @@ function inflection_changesize(size){
 }
 //股票代码单击事件，结果是执行拐点数据框查询，并显示本次的股票信息
 function inflection_security_click(obj){
-    console.log(obj);
     $("#inflection_security_code").val(obj.value);
     inflection_point_grid_query();
     $("#show_stock_info").html("【"+obj.value + " " + obj.name +"】");
+    security_name = obj.name
 }
 //拐点数据框查询公用方法
 function inflection_point_grid_query(){
     var security_code = $("#inflection_security_code").val();
     var size = $("#inflection_size").val();
-    console.log(security_code);
     $("#inflection_point_grid").datagrid({
         queryParams: {
             security_code: security_code,
             size: size
         }
     });
+    get_stock_history_kline(security_code, size);
 }
 //查询全部股票列表
 function query_all_stockinfo(){
@@ -319,4 +319,108 @@ function query_all_stockinfo(){
 
 function formatToButton(val,row){
     return '<button type="button" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+row.security_code+'" title="'+row.security_name+'" name="'+row.security_name+'">'+row.security_code+'</button>'
+}
+
+function get_stock_history_kline(security_code, size){
+    if(security_code != '' && security_code != undefined){
+        Highcharts.setOptions({
+            lang: {
+                rangeSelectorZoom: ''
+            }
+        });
+        $.getJSON('/history_kline_get?security_code=' + security_code + '&size=' + size, function (data) {
+            var ohlc = [],
+                volume = [],
+                dataLength = data.length,
+                // set the allowed units for data grouping
+                groupingUnits = [[
+                    'week',                         // unit name
+                    [1]                             // allowed multiples
+                ], [
+                    'month',
+                    [1, 2, 3, 4, 6]
+                ]],
+                i = 0;
+            for (i; i < dataLength; i += 1) {
+                ohlc.push([
+                    data[i][0], // the date
+                    data[i][1], // open
+                    data[i][2], // high
+                    data[i][3], // low
+                    data[i][4] // close
+                ]);
+                volume.push([
+                    data[i][0], // the date
+                    data[i][5] // the volume
+                ]);
+            }
+            // create the chart
+            $('#container').highcharts('StockChart', {
+                rangeSelector: {
+                    selected: 1,
+                    inputDateFormat: '%Y-%m-%d'
+                },
+                title: {
+                    text: security_name + '历史股价'
+                },
+                xAxis: {
+                    dateTimeLabelFormats: {
+                        millisecond: '%H:%M:%S.%L',
+                        second: '%H:%M:%S',
+                        minute: '%H:%M',
+                        hour: '%H:%M',
+                        day: '%m-%d',
+                        week: '%m-%d',
+                        month: '%y-%m',
+                        year: '%Y'
+                    }
+                },
+                yAxis: [{
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: '股价'
+                    },
+                    height: '60%',
+                    lineWidth: 2
+                }, {
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: '成交量'
+                    },
+                    top: '65%',
+                    height: '35%',
+                    offset: 0,
+                    lineWidth: 2
+                }],
+                series: [{
+                    type: 'candlestick',
+                    name: security_name,
+                    color: 'green',
+                    lineColor: 'green',
+                    upColor: 'red',
+                    upLineColor: 'red',
+                    tooltip: {
+                    },
+                    data: ohlc,
+                    dataGrouping: {
+                        units: groupingUnits
+                    }
+                }, {
+                    type: 'column',
+                    name: 'Volume',
+                    data: volume,
+                    yAxis: 1,
+                    dataGrouping: {
+                        units: groupingUnits
+                    }
+                }]
+            });
+        });
+    }
 }

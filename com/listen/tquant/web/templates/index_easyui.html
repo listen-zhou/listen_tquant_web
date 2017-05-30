@@ -8,11 +8,18 @@
 	<script type="text/javascript" src="{{ static_url('easyui/js/jquery.min.js') }}"></script>
 	<script type="text/javascript" src="{{ static_url('easyui/js/jquery.easyui.min.js') }}"></script>
 	<script type="text/javascript" src="{{ static_url('js/inflection.point.js') }}"></script>
-	<script type="text/javascript">
 
+	<!-- 股票历史K线图相关js -->
+	<script src="https://img.hcharts.cn/highstock/highstock.js"></script>
+	<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+	<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+	<script src="https://img.hcharts.cn/highcharts/themes/grid-light.js"></script>
+	<script type="text/javascript">
+		var security_name = '';
 		$(function(){
 			//interval_codes_reload = window.setInterval("worth_buying_codes_reload()", 50000);
 			//query_all_stockinfo();
+
 		});
 
 	</script>
@@ -99,7 +106,9 @@
 					</table>
 				</div>
 			</div>
-
+		</div>
+		<div title="历史行情K线" id="history_kline">
+			<div id="container" style="min-width: 400px; height: 600px;">图表加载中。。。</div>
 		</div>
 	</div>
 </body>
