@@ -7,19 +7,15 @@
 	<link rel="stylesheet" type="text/css" href="{{ static_url('easyui/themes/icon.css') }}">
 	<script type="text/javascript" src="{{ static_url('easyui/js/jquery.min.js') }}"></script>
 	<script type="text/javascript" src="{{ static_url('easyui/js/jquery.easyui.min.js') }}"></script>
+	<!-- 股票历史K线图相关js -->
+	<script src="{{ static_url('js/echarts.js') }}"></script>
 	<script type="text/javascript" src="{{ static_url('js/inflection.point.js') }}"></script>
 
-	<!-- 股票历史K线图相关js -->
-	<script src="https://img.hcharts.cn/highstock/highstock.js"></script>
-	<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
-	<script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
-	<script src="https://img.hcharts.cn/highcharts/themes/grid-light.js"></script>
 	<script type="text/javascript">
 		var security_name = '';
 		$(function(){
-			//interval_codes_reload = window.setInterval("worth_buying_codes_reload()", 50000);
-			//query_all_stockinfo();
-
+			interval_codes_reload = window.setInterval("inflection_point_grid_query()", 4*60*1000);
+			inflection_point_grid_query();
 		});
 
 	</script>
@@ -53,6 +49,7 @@
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)">近200日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(250)">近250日</a>
 						<label id="show_stock_info" style="width: 20px; color: red; font-weight: bold;"></label>
+                        <label id="interval_time" style="width: 20px; color: blue; font-weight: bold;"></label>
 					</div>
 					<input type="hidden" id="inflection_security_code">
 					<input type="hidden" id="inflection_size" value="20">
@@ -108,7 +105,7 @@
 			</div>
 		</div>
 		<div title="历史行情K线" id="history_kline">
-			<div id="container" style="min-width: 400px; height: 600px;">图表加载中。。。</div>
+			<div id="main" style="width: 1500px; height: 610px;"></div>
 		</div>
 	</div>
 </body>

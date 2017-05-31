@@ -222,3 +222,9 @@ class Utils():
             return result
         else:
             return None
+
+    @staticmethod
+    def format_yyyy_mm_dd(val):
+        if val is not None:
+            return val.strftime('%Y-%m-%d')
+        return val
