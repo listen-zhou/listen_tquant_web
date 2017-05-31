@@ -228,3 +228,9 @@ class Utils():
         if val is not None:
             return val.strftime('%Y-%m-%d')
         return val
+
+    @staticmethod
+    def format_week_day(val):
+        if isinstance(val, datetime.date) or isinstance(val, datetime.datetime):
+            return val.weekday() + 1
+        return val

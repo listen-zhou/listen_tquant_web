@@ -21,7 +21,7 @@
 	</script>
 </head>
 <body>
-	<div class="easyui-tabs" style="width: 100%; height: 635px; align: center">
+	<div class="easyui-tabs" style="width: 100%; height: 760px; align: center">
 		<div title="分析拐点" id="inflection_point">
 			<div class="easyui-layout" style="width: 100%; height: 100%">
 				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 11%;">
@@ -54,7 +54,7 @@
 					<input type="hidden" id="inflection_security_code">
 					<input type="hidden" id="inflection_size" value="20">
 					<table id="inflection_point_grid" class="easyui-datagrid" title="分析拐点" style="width: 100%; height: 100%;"
-							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
+							data-options="remoteSort:false, rownumbers:true, singleSelect:false,
 							url:'/inflection_point_post', method:'post', toolbar:'#inflection_tools'">
 						<thead>
 							<tr>
@@ -98,6 +98,7 @@
 
 								<th data-options="field:'price_avg_chg_10_avg', align:'center', styler:cellPercent1Styler, formatter:formatPercent"><b style="color: red; background-color: gold;">10均幅均</b></th>
 								<th data-options="field:'price_avg_chg_10_avg_diff', align:'center', formatter:formatImg">连续</th>
+                                <th data-options="field:'week_day', align:'center'">周几</th>
 							</tr>
 						</thead>
 					</table>
@@ -105,7 +106,7 @@
 			</div>
 		</div>
 		<div title="历史行情K线" id="history_kline">
-			<div id="main" style="width: 1500px; height: 610px;"></div>
+			<div id="main" style="width: 1500px; height: 750px;"></div>
 		</div>
 	</div>
 </body>

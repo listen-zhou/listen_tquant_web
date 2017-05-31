@@ -288,6 +288,14 @@ function inflection_security_click(obj){
 }
 //拐点数据框查询公用方法
 function inflection_point_grid_query(){
+    var currentDate = new Date();
+    var hours = currentDate.getHours();
+    var minutes = currentDate.getMinutes();
+    var seconds = currentDate.getSeconds();
+    if(interval_codes_reload && hours >= 15 && minutes >= 0 && seconds >= 0){
+        console.log('非交易时间点，不做更新');
+        window.clearInterval(interval_codes_reload);
+    }
     var security_code = $("#inflection_security_code").val();
     var size = $("#inflection_size").val();
     if(security_code == '' || security_code == undefined){
