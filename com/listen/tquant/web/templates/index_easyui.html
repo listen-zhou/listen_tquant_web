@@ -37,8 +37,11 @@
 					</table>
 
 				</div>
-				<div data-options="region: 'center', split: true" title="Center">
+				<div id="inflection_point_data" data-options="region: 'center', split: true" title="Center">
 					<div id="inflection_tools">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="cancel_bgcolor()">背景消除</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="buy_in()">买入</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="sell_out()">卖出</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(30)">近30日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(40)">近40日</a>
@@ -54,7 +57,7 @@
 					<input type="hidden" id="inflection_security_code">
 					<input type="hidden" id="inflection_size" value="20">
 					<table id="inflection_point_grid" class="easyui-datagrid" title="分析拐点" style="width: 100%; height: 100%;"
-							data-options="remoteSort:false, rownumbers:true, singleSelect:false,
+							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
 							url:'/inflection_point_post', method:'post', toolbar:'#inflection_tools'">
 						<thead>
 							<tr>

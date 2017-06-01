@@ -338,6 +338,34 @@ function formatToButton(val,row){
     return '<button type="button" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+row.security_code+'" title="'+row.security_name+'" name="'+row.security_name+'">'+row.security_code+'</button>'
 }
 
+function cancel_bgcolor(){
+    var rows = $('#inflection_point_grid').datagrid('getSelections');
+    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
+    console.log('index:' + index);
+    var div = $("#inflection_point_data");
+    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", '');
+}
+
+function buy_in(){
+    var rows = $('#inflection_point_grid').datagrid('getSelections');
+    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
+    console.log('index:' + index);
+    var div = $("#inflection_point_data");
+    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'Tomato');
+}
+
+function sell_out(){
+    var rows = $('#inflection_point_grid').datagrid('getSelections');
+    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
+    console.log('index:' + index);
+    var div = $("#inflection_point_data");
+    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'LightGreen');
+}
+
+function formatDayKlineId(val, row){
+    return 'day_kline_' + val;
+}
+
 function get_stock_history_kline(security_code, size){
     if(security_code != '' && security_code != undefined){
         $.ajax({
