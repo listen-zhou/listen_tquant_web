@@ -341,7 +341,6 @@ function formatToButton(val,row){
 function cancel_bgcolor(){
     var rows = $('#inflection_point_grid').datagrid('getSelections');
     var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    console.log('index:' + index);
     var div = $("#inflection_point_data");
     var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", '');
 }
@@ -349,7 +348,6 @@ function cancel_bgcolor(){
 function buy_in(){
     var rows = $('#inflection_point_grid').datagrid('getSelections');
     var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    console.log('index:' + index);
     var div = $("#inflection_point_data");
     var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'Tomato');
 }
@@ -357,7 +355,6 @@ function buy_in(){
 function sell_out(){
     var rows = $('#inflection_point_grid').datagrid('getSelections');
     var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    console.log('index:' + index);
     var div = $("#inflection_point_data");
     var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'LightGreen');
 }

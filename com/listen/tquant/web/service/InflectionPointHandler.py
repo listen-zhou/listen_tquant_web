@@ -34,7 +34,7 @@ class InflectionPointHandler(RequestHandler):
 
     @staticmethod
     def get_day_kline_list_keys():
-        list_keys = ['id', 'the_date',
+        list_keys = ['the_date',
                      'amount',
                      'vol', 'open', 'high', 'low', 'close',
                      'vol_chg', 'close_chg', 'close_open_chg',
@@ -133,7 +133,7 @@ class InflectionPointHandler(RequestHandler):
                      'price_avg_chg_10_avg', 'price_avg_chg_10_avg_diff', 'money_flow'
             """
             sql = "select " \
-                  "id, the_date, " \
+                  "the_date, " \
                   "amount, " \
                   "vol, open, high, low, close, " \
                   "vol_chg, close_chg, close_open_chg, " \
