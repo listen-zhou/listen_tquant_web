@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="{{ static_url('easyui/js/jquery.easyui.min.js') }}"></script>
 	<!-- 股票历史K线图相关js -->
 	<script src="{{ static_url('js/echarts.js') }}"></script>
+    <script src="{{ static_url('js/shine.js') }}"></script>
 	<script type="text/javascript" src="{{ static_url('js/inflection.point.js') }}"></script>
 
 	<script type="text/javascript">
@@ -39,10 +40,10 @@
 				</div>
 				<div id="inflection_point_data" data-options="region: 'center', split: true" title="Center">
 					<div id="inflection_tools">
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="cancel_bgcolor()">背景消除</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="buy_in()">买入</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="sell_out()">卖出</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="buy_in()">买入标记</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="sell_out()">卖出标记</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="cancel_bgcolor()">标记消除</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(30)">近30日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(40)">近40日</a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(50)">近50日</a>
@@ -109,7 +110,7 @@
 			</div>
 		</div>
 		<div title="历史行情K线" id="history_kline">
-			<div id="main" style="width: 1500px; height: 750px;"></div>
+			<div id="main" style="width: 1500px; height: 740px;"></div>
 		</div>
 	</div>
 </body>

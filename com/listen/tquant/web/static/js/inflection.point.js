@@ -412,7 +412,7 @@ function calculateMA(dayCount, data) {
 
 function analysis_history_kline(rawData) {
     var security_code = $("#show_stock_info").html();
-    var myChart = echarts.init(document.getElementById('main'));
+    var myChart = echarts.init(document.getElementById('main'), 'shine');
     var data = splitData(rawData);
 
     myChart.setOption(option = {
@@ -467,14 +467,14 @@ function analysis_history_kline(rawData) {
         },
         grid: [
             {
-                left: '10%',
-                right: '8%',
-                height: '50%'
+                left: '2%',
+                right: '2%',
+                height: '62%'
             },
             {
-                left: '10%',
-                right: '8%',
-                top: '63%',
+                left: '2%',
+                right: '2%',
+                top: '68%',
                 height: '16%'
             }
         ],
@@ -485,7 +485,7 @@ function analysis_history_kline(rawData) {
                 scale: true,
                 boundaryGap : false,
                 axisLine: {onZero: false},
-                splitLine: {show: false},
+                splitLine: {show: true},
                 splitNumber: 20,
                 min: 'dataMin',
                 max: 'dataMax',
@@ -501,7 +501,7 @@ function analysis_history_kline(rawData) {
                 boundaryGap : false,
                 axisLine: {onZero: false},
                 axisTick: {show: false},
-                splitLine: {show: false},
+                splitLine: {show: true},
                 axisLabel: {show: false},
                 splitNumber: 20,
                 min: 'dataMin',
@@ -532,16 +532,16 @@ function analysis_history_kline(rawData) {
                 gridIndex: 1,
                 splitNumber: 2,
                 axisLabel: {show: false},
-                axisLine: {show: false},
+                axisLine: {show: true},
                 axisTick: {show: false},
-                splitLine: {show: false}
+                splitLine: {show: true}
             }
         ],
         dataZoom: [
             {
                 type: 'inside',
                 xAxisIndex: [0, 1],
-                start: 98,
+                start: 97,
                 end: 100
             },
             {
