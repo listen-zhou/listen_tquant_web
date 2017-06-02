@@ -40,18 +40,19 @@
 				</div>
 				<div id="inflection_point_data" data-options="region: 'center', split: true" title="Center">
 					<div id="inflection_tools">
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="buy_in()">买入标记</a>
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="sell_out()">卖出标记</a>
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="cancel_bgcolor()">标记消除</a>
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)">近20日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(30)">近30日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(40)">近40日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(50)">近50日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(70)">近70日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(100)">近100日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(150)">近150日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)">近200日</a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(250)">近250日</a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('buy')" style="background-color: red; color: gold;"><strong style="background-color: red; color: gold;">买入标记</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('sell')" style="background-color: green; color: gold;"><strong style="background-color: green; color: gold;">卖出标记</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('cancel')" style="background-color: #FFEC8B;"><strong style="background-color: #FFEC8B;">标记消除</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)"><strong style="background-color: Violet; color: gold;">近20日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(50)"><strong style="background-color: Blue; color: gold;">近50日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(100)"><strong style="background-color: Violet; color: gold;">近100日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)"><strong style="background-color: Blue; color: gold;">近200日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(300)"><strong style="background-color: Violet; color: gold;">近300日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(400)"><strong style="background-color: Blue; color: gold;">近400日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(500)"><strong style="background-color: Violet; color: gold;">近500日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(600)"><strong style="background-color: Blue; color: gold;">近600日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(700)"><strong style="background-color: Violet; color: gold;">近700日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(800)"><strong style="background-color: Blue; color: gold;">近800日</strong></a>
 						<label id="show_stock_info" style="width: 20px; color: red; font-weight: bold;"></label>
                         <label id="interval_time" style="width: 20px; color: blue; font-weight: bold;"></label>
 					</div>

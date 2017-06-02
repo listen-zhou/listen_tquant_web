@@ -345,6 +345,26 @@ function cancel_bgcolor(){
     var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", '');
 }
 
+function change_bgcolor(type){
+    var bgcolor = '';
+    if(type == 'sell'){
+        bgcolor = 'LightGreen';
+    }
+    else if(type == 'buy'){
+        bgcolor = 'Tomato';
+    }
+    else if(type == 'cancel'){
+        bgcolor = '';
+    }
+    var rows = $('#inflection_point_grid').datagrid('getSelections');
+    if(rows.length > 0){
+        var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
+        var div = $("#inflection_point_data");
+        var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", bgcolor);
+    }
+
+}
+
 function buy_in(){
     var rows = $('#inflection_point_grid').datagrid('getSelections');
     var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])

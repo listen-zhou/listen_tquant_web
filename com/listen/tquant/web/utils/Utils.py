@@ -190,7 +190,7 @@ class Utils():
     @staticmethod
     def json_default(val):
         if isinstance(val, datetime.date):
-            return val.strftime('%m-%d')
+            return val.strftime('%Y-%m-%d')
         return val
 
     @staticmethod
