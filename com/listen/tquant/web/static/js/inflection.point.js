@@ -338,13 +338,6 @@ function formatToButton(val,row){
     return '<button type="button" onclick="inflection_security_click(this)" class="easyui-linkbutton" value="'+row.security_code+'" title="'+row.security_name+'" name="'+row.security_name+'">'+row.security_code+'</button>'
 }
 
-function cancel_bgcolor(){
-    var rows = $('#inflection_point_grid').datagrid('getSelections');
-    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    var div = $("#inflection_point_data");
-    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", '');
-}
-
 function change_bgcolor(type){
     var bgcolor = '';
     if(type == 'sell'){
@@ -365,18 +358,16 @@ function change_bgcolor(type){
 
 }
 
-function buy_in(){
+function delete_rows(){
     var rows = $('#inflection_point_grid').datagrid('getSelections');
-    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    var div = $("#inflection_point_data");
-    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'Tomato');
-}
-
-function sell_out(){
-    var rows = $('#inflection_point_grid').datagrid('getSelections');
-    var index = $('#inflection_point_grid').datagrid('getRowIndex', rows[0])
-    var div = $("#inflection_point_data");
-    var tr = $($(div).find('div.datagrid-view2').find('.datagrid-row')[index]).css("background-color", 'LightGreen');
+    if(rows.length > 0){
+        var i = 0;
+        var index = -1;
+        for(i; i < rows.length; i++){
+            index = $('#inflection_point_grid').datagrid('getRowIndex', rows[i]);
+            $('#inflection_point_grid').datagrid('deleteRow', index);
+        }
+    }
 }
 
 function formatDayKlineId(val, row){
@@ -678,4 +669,45 @@ function analysis_history_kline(rawData) {
 //            }
 //        ]
 //    });
+}
+
+function simulated_short_line_stock(){
+    var rows = $('#simulated_stocks').datagrid('getSelections');
+    if(rows.length == 0){
+        $.messager.alert('警告', '请先选择一个股票', 'warning');
+        return;
+    }
+    security_code = rows[0].security_code
+    security_name = rows[0].security_name
+    $("#simulated_short_line_stock_grid").datagrid({
+        queryParams: {
+            security_code: security_code,
+            buy_money_flow_relation: $("#buy_money_flow_relation").val(),
+            buy_money_flow_field_value: $("#buy_money_flow_field_value").val(),
+            buy_close_chg_relation: $("#buy_close_chg_relation").val(),
+            buy_close_chg_field_value: $("#buy_close_chg_field_value").val(),
+            buy_close_open_chg_relation: $("#buy_close_open_chg_relation").val(),
+            buy_close_open_chg_field_value: $("#buy_close_open_chg_field_value").val(),
+            buy_price_avg_chg_relation: $("#buy_price_avg_chg_relation").val(),
+            buy_price_avg_chg_field_value: $("#buy_price_avg_chg_field_value").val(),
+            buy_price_avg_chg_3_relation: $("#buy_price_avg_chg_3_relation").val(),
+            buy_price_avg_chg_3_field_value: $("#buy_price_avg_chg_3_field_value").val(),
+            buy_price_avg_chg_5_relation: $("#buy_price_avg_chg_5_relation").val(),
+            buy_price_avg_chg_5_field_value: $("#buy_price_avg_chg_5_field_value").val(),
+
+            sell_money_flow_relation: $("#sell_money_flow_relation").val(),
+            sell_money_flow_field_value: $("#sell_money_flow_field_value").val(),
+            sell_close_chg_relation: $("#sell_close_chg_relation").val(),
+            sell_close_chg_field_value: $("#sell_close_chg_field_value").val(),
+            sell_close_open_chg_relation: $("#sell_close_open_chg_relation").val(),
+            sell_close_open_chg_field_value: $("#sell_close_open_chg_field_value").val(),
+            sell_price_avg_chg_relation: $("#sell_price_avg_chg_relation").val(),
+            sell_price_avg_chg_field_value: $("#sell_price_avg_chg_field_value").val(),
+            sell_price_avg_chg_3_relation: $("#sell_price_avg_chg_3_relation").val(),
+            sell_price_avg_chg_3_field_value: $("#sell_price_avg_chg_3_field_value").val(),
+            sell_price_avg_chg_5_field_relation: $("#sell_price_avg_chg_5_field_relation").val(),
+            sell_price_avg_chg_5_field_value: $("#sell_price_avg_chg_5_field_value").val()
+        }
+    });
+    $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
 }

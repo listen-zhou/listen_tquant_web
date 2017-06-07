@@ -12,25 +12,18 @@ class InflectionPointHandler(RequestHandler):
 
     def post(self):
         security_code = self.get_argument('security_code', None)
-        size = self.get_argument('size', 20)
+        size = self.get_argument('size', 100)
         if security_code is not None:
             result = self.get_stock_day_kline(security_code, size)
             result = Utils.tuples_to_dicts(result, self.get_day_kline_list_keys())
             print('result', result)
-            result = InflectionPointHandler.append_week_day(result)
+            result = Utils.append_week_day(result)
             result = {"rows": result}
             result_json = simplejson.dumps(result, default=Utils.json_default)
             print('get_stock_day_kline result: ', result_json)
             self.write(result_json)
         else:
             self.write("no data!!!")
-
-    @staticmethod
-    def append_week_day(result):
-        if result is not None and len(result) > 0:
-            for i in range(len(result)):
-                result[i]['week_day'] = Utils.format_week_day(result[i]['the_date'])
-        return result
 
     @staticmethod
     def get_day_kline_list_keys():

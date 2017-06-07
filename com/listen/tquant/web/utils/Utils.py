@@ -234,3 +234,14 @@ class Utils():
         if isinstance(val, datetime.date) or isinstance(val, datetime.datetime):
             return val.weekday() + 1
         return val
+
+    @staticmethod
+    def append_week_day(result):
+        if result is not None and len(result) > 0:
+            for i in range(len(result)):
+                result[i]['week_day'] = Utils.format_week_day(result[i]['the_date'])
+        return result
+
+    @staticmethod
+    def str_to_decimal(str, n):
+        return Utils.base_round(Decimal(str), n)

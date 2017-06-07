@@ -18,6 +18,10 @@
 			interval_codes_reload = window.setInterval("inflection_point_grid_query()", 4*60*1000);
 			inflection_point_grid_query();
 		});
+		function stop_interval(){
+		    console.log('手动停止定时器');
+            window.clearInterval(interval_codes_reload);
+		}
 
 	</script>
 </head>
@@ -43,37 +47,29 @@
 						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('buy')" style="background-color: red; color: gold;"><strong style="background-color: red; color: gold;">买入标记</strong></a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('sell')" style="background-color: green; color: gold;"><strong style="background-color: green; color: gold;">卖出标记</strong></a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="change_bgcolor('cancel')" style="background-color: #FFEC8B;"><strong style="background-color: #FFEC8B;">标记消除</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(20)"><strong style="background-color: Violet; color: gold;">近20日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(50)"><strong style="background-color: Blue; color: gold;">近50日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" onclick="delete_rows()" style="background-color: red; color: gold;"><strong style="background-color: red; color: gold;">删除行</strong></a>
 						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(100)"><strong style="background-color: Violet; color: gold;">近100日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)"><strong style="background-color: Blue; color: gold;">近200日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(300)"><strong style="background-color: Violet; color: gold;">近300日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(400)"><strong style="background-color: Blue; color: gold;">近400日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(500)"><strong style="background-color: Violet; color: gold;">近500日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(600)"><strong style="background-color: Blue; color: gold;">近600日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(700)"><strong style="background-color: Violet; color: gold;">近700日</strong></a>
-						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(800)"><strong style="background-color: Blue; color: gold;">近800日</strong></a>
-						<label id="show_stock_info" style="width: 20px; color: red; font-weight: bold;"></label>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(200)"><strong style="background-color: Blue; color: gold;">近150日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(300)"><strong style="background-color: Violet; color: gold;">近200日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(400)"><strong style="background-color: Blue; color: gold;">近250日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(500)"><strong style="background-color: Violet; color: gold;">近300日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(600)"><strong style="background-color: Blue; color: gold;">近350日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(700)"><strong style="background-color: Violet; color: gold;">近400日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(800)"><strong style="background-color: Blue; color: gold;">近450日</strong></a>
+						<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-search" onclick="inflection_changesize(800)"><strong style="background-color: Blue; color: gold;">近500日</strong></a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="stop_interval()" style="background-color: red; color: gold;"><strong style="background-color: red; color: gold;">停止定时器</strong></a>
+                        <label id="show_stock_info" style="width: 20px; color: red; font-weight: bold;"></label>
                         <label id="interval_time" style="width: 20px; color: blue; font-weight: bold;"></label>
 					</div>
 					<input type="hidden" id="inflection_security_code">
-					<input type="hidden" id="inflection_size" value="20">
+					<input type="hidden" id="inflection_size" value="100">
+                    <!-- 历史行情数据表格 -->
 					<table id="inflection_point_grid" class="easyui-datagrid" title="分析拐点" style="width: 100%; height: 100%;"
-							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
+							data-options="remoteSort:false, rownumbers:true, singleSelect:false,
 							url:'/inflection_point_post', method:'post', toolbar:'#inflection_tools'">
 						<thead>
 							<tr>
-								<!--
-								'the_date',
-								 'amount',
-								 'vol', 'open', 'high', 'low', 'close',
-								 'vol_chg', 'close_chg', 'close_open_chg',
-								 'price_avg', 'price_avg_chg', 'close_price_avg_chg',
-								 'price_avg_3', 'price_avg_chg_3',
-								 'price_avg_5', 'price_avg_chg_5',
-								 'price_avg_10', 'price_avg_chg_10', 'close_10_price_avg_chg',
-								 'price_avg_chg_10_avg', 'price_avg_chg_10_avg_diff', 'money_flow'
-								-->
+                                <th data-options="field:'ck'" checkbox="true"></th>
 								<th data-options="field:'the_date'">交易日</th>
 								<th data-options="field:'open', align:'center'">开</th>
 								<th data-options="field:'high', align:'center'">高</th>
@@ -113,6 +109,311 @@
 		<div title="历史行情K线" id="history_kline">
 			<div id="main" style="width: 1500px; height: 740px;"></div>
 		</div>
+        <div title="模拟短线炒股" id="simulated_short_line_stock">
+            <div class="easyui-layout" style="width: 100%; height: 100%">
+                <div data-options="region: 'west', split: true" title="West" style="width: 15%; height: 100%;">
+                    <div class="easyui-panel" title="设置触发买入条件" style="width: 100%; color: red; background-color: gold; font-weight:bold;">
+                        <table>
+                            <thead>
+                                <tr style="font-size: 13px;">
+                                    <td>指标名</td>
+                                    <td>对比关系</td>
+                                    <td>对比值</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>钱流:</td>
+                                    <td>
+                                        <select name="buy_money_flow_relation" id="buy_money_flow_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_money_flow_field_value" id="buy_money_flow_field_value" class="easyui-numberspinner" value="100" style="width:80px;"
+                                               data-options="min:0,max:500, increment: 10, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>收幅:</td>
+                                    <td>
+                                        <select name="buy_close_chg_relation" id="buy_close_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_close_chg_field_value" id="buy_close_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>收开幅:</td>
+                                    <td>
+                                        <select name="buy_close_open_chg_relation" id="buy_close_open_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_close_open_chg_field_value" id="buy_close_open_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>日均幅:</td>
+                                    <td>
+                                        <select name="buy_price_avg_chg_relation" id="buy_price_avg_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_price_avg_chg_field_value" id="buy_price_avg_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3日均幅:</td>
+                                    <td>
+                                        <select name="buy_price_avg_chg_3_relation" id="buy_price_avg_chg_3_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_price_avg_chg_3_field_value" id="buy_price_avg_chg_3_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5日均幅:</td>
+                                    <td>
+                                        <select name="buy_price_avg_chg_5_relation" id="buy_price_avg_chg_5_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="buy_price_avg_chg_5_field_value" id="buy_price_avg_chg_5_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="easyui-panel" title="设置触发卖出条件" style="width: 100%; color: green; background-color: gold; font-weight:bold;">
+                        <table>
+                            <thead>
+                                <tr style="font-size: 13px;">
+                                    <td>指标名</td>
+                                    <td>对比关系</td>
+                                    <td>对比值</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>钱流:</td>
+                                    <td>
+                                        <select name="sell_money_flow_relation" id="sell_money_flow_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_money_flow_field_value" id="sell_money_flow_field_value" class="easyui-numberspinner" value="100" style="width:80px;"
+                                               data-options="min:0,max:500, increment: 10, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>收幅:</td>
+                                    <td>
+                                        <select name="sell_close_chg_relation" id="sell_close_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_close_chg_field_value" id="sell_close_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>收开幅:</td>
+                                    <td>
+                                        <select name="sell_close_open_chg_relation" id="sell_close_open_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_close_open_chg_field_value" id="sell_close_open_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>日均幅:</td>
+                                    <td>
+                                        <select name="sell_price_avg_chg_relation" id="sell_price_avg_chg_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_price_avg_chg_field_value" id="sell_price_avg_chg_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3日均幅:</td>
+                                    <td>
+                                        <select name="sell_price_avg_chg_3_relation" id="sell_price_avg_chg_3_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_price_avg_chg_3_field_value" id="sell_price_avg_chg_3_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5日均幅:</td>
+                                    <td>
+                                        <select name="sell_price_avg_chg_5_field_relation" id="sell_price_avg_chg_5_field_relation" class="easyui-combobox">
+                                            <option value="">请选择</option>
+                                            <option value=">">&gt;</option>
+                                            <option value=">=">&gt;=</option>
+                                            <option value="=">=</option>
+                                            <option value="<=">&lt;=</option>
+                                            <option value="<">&lt;</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input name="sell_price_avg_chg_5_field_value" id="sell_price_avg_chg_5_field_value" class="easyui-numberspinner" value="0" style="width:80px;"
+                                               data-options="min:-10,max:10, increment: 1, required:true,precision:2,groupSeparator:',',decimalSeparator:'.',suffix:'%'">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="simulated_tools">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="simulated_short_line_stock()" style="background-color: red; color: gold;">
+                            <strong style="background-color: red; color: gold;">选中股票->开始模拟炒股</strong>
+                        </a>
+                    </div>
+                    <table id="simulated_stocks" class="easyui-datagrid" title="选择短线股票" style="width: 100%; height: 35%;"
+							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
+							url:'/inflection_point_get', method:'get', toolbar:'#simulated_tools'">
+						<thead>
+							<tr>
+								<th data-options="field:'security_code', align:'center'">股票代码</th>
+								<th data-options="field:'security_name', align:'center'">股票名称</th>
+							</tr>
+						</thead>
+					</table>
+                </div>
+                <div id="simulated_result_tools">
+                    <label id="simulated_stock_info" style="width: 20px; color: red; font-weight: bold;"></label>
+                </div>
+                <div data-options="region: 'center', split: true" title="Center">
+                    <!-- 模拟炒股结果数据表格 -->
+                    <table id="simulated_short_line_stock_grid" class="easyui-datagrid" title="模拟短线炒股" style="width: 100%; height: 100%;"
+                           data-options="remoteSort:false, rownumbers:true, singleSelect:false, toolbar:'#simulated_result_tools',
+                           url:'/simulated_short_line_stock_post', method:'post', onLoadSuccess: function(){$(this).datagrid('freezeRow',0);}">
+                        <thead data-options="frozen:true">
+                            <tr>
+                                <th data-options="field:'the_date'">交易日</th>
+                            </tr>
+                        </thead>
+                        <thead>
+                        <tr>
+                            <th data-options="field:'open', align:'center'">开</th>
+                            <th data-options="field:'high', align:'center'">高</th>
+                            <th data-options="field:'low', align:'center'">低</th>
+                            <th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
+                            <th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
+                            <th data-options="field:'close_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/日均幅</th>
+                            <th data-options="field:'close_10_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
+                            <th data-options="field:'close_open_chg', align:'center', styler:cellCloseOpenStyler, formatter:formatPercent">收/开幅</th>
+
+                            <th data-options="field:'vol', align:'center'">量(股)</th>
+                            <th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量幅</b></th>
+                            <th data-options="field:'amount', align:'center'">额(元)</th>
+                            <th data-options="field:'money_flow', align:'center', styler:cellMoneyFlowStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">钱流</b></th>
+
+                            <th data-options="field:'price_avg', align:'center', styler:cellDayAvgPriceStyler">日均</th>
+                            <th data-options="field:'price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">日均幅</b></th>
+
+                            <th data-options="field:'price_avg_3', align:'center', styler:cellDayAvgPrice3Styler">3均</th>
+                            <th data-options="field:'price_avg_chg_3', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+
+                            <th data-options="field:'price_avg_5', align:'center', styler:cellDayAvgPrice5Styler">5均</th>
+                            <th data-options="field:'price_avg_chg_5', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+
+                            <th data-options="field:'price_avg_10', align:'center', styler:cellDayAvgPrice10Styler">10均</th>
+                            <th data-options="field:'price_avg_chg_10', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+
+                            <th data-options="field:'price_avg_chg_10_avg', align:'center', styler:cellPercent1Styler, formatter:formatPercent"><b style="color: red; background-color: gold;">10均幅均</b></th>
+                            <th data-options="field:'price_avg_chg_10_avg_diff', align:'center', formatter:formatImg">连续</th>
+                            <th data-options="field:'week_day', align:'center'">周几</th>
+
+                            <th data-options="field:'earnings', align:'center', formatter:formatPercent">收益率</th>
+                            <th data-options="field:'status', align:'center'">买卖</th>
+                            <th data-options="field:'position_hands', align:'center'">手数</th>
+                            <th data-options="field:'left_money', align:'center'">余钱</th>
+                            <th data-options="field:'total_money', align:'center'">持仓总额</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
 	</div>
 </body>
 </html>
