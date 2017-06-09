@@ -677,37 +677,55 @@ function simulated_short_line_stock(){
         $.messager.alert('警告', '请先选择一个股票', 'warning');
         return;
     }
+    $("#simulated_security_code").val(rows[0].security_code);
     security_code = rows[0].security_code
     security_name = rows[0].security_name
-    $("#simulated_short_line_stock_grid").datagrid({
-        queryParams: {
-            security_code: security_code,
-            buy_money_flow_relation: $("#buy_money_flow_relation").val(),
-            buy_money_flow_field_value: $("#buy_money_flow_field_value").val(),
-            buy_close_chg_relation: $("#buy_close_chg_relation").val(),
-            buy_close_chg_field_value: $("#buy_close_chg_field_value").val(),
-            buy_close_open_chg_relation: $("#buy_close_open_chg_relation").val(),
-            buy_close_open_chg_field_value: $("#buy_close_open_chg_field_value").val(),
-            buy_price_avg_chg_relation: $("#buy_price_avg_chg_relation").val(),
-            buy_price_avg_chg_field_value: $("#buy_price_avg_chg_field_value").val(),
-            buy_price_avg_chg_3_relation: $("#buy_price_avg_chg_3_relation").val(),
-            buy_price_avg_chg_3_field_value: $("#buy_price_avg_chg_3_field_value").val(),
-            buy_price_avg_chg_5_relation: $("#buy_price_avg_chg_5_relation").val(),
-            buy_price_avg_chg_5_field_value: $("#buy_price_avg_chg_5_field_value").val(),
-
-            sell_money_flow_relation: $("#sell_money_flow_relation").val(),
-            sell_money_flow_field_value: $("#sell_money_flow_field_value").val(),
-            sell_close_chg_relation: $("#sell_close_chg_relation").val(),
-            sell_close_chg_field_value: $("#sell_close_chg_field_value").val(),
-            sell_close_open_chg_relation: $("#sell_close_open_chg_relation").val(),
-            sell_close_open_chg_field_value: $("#sell_close_open_chg_field_value").val(),
-            sell_price_avg_chg_relation: $("#sell_price_avg_chg_relation").val(),
-            sell_price_avg_chg_field_value: $("#sell_price_avg_chg_field_value").val(),
-            sell_price_avg_chg_3_relation: $("#sell_price_avg_chg_3_relation").val(),
-            sell_price_avg_chg_3_field_value: $("#sell_price_avg_chg_3_field_value").val(),
-            sell_price_avg_chg_5_field_relation: $("#sell_price_avg_chg_5_field_relation").val(),
-            sell_price_avg_chg_5_field_value: $("#sell_price_avg_chg_5_field_value").val()
+    $("#simulated_form").form('submit', {
+        url: 'simulated_short_line_stock_post',
+        dataType: 'json',
+        success: function(data){
+            $("#simulated_short_line_stock_grid").datagrid({
+                data: $.parseJSON(data)
+            });
         }
     });
+
     $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
+}
+
+function cellTradeDirection(value,row,index){
+    if(value == '买'){
+        return 'background-color:red; color:gold;';
+    }
+    else{
+        return 'background-color:green; color:gold;';
+    }
+}
+
+function cellTotalMoney(value,row,index){
+    if(value > 20000){
+        return 'background-color:red; color:gold;';
+    }
+    else{
+        return 'background-color:green; color:gold;';
+    }
+}
+
+function myformatter(date){
+    var y = date.getFullYear();
+    var m = date.getMonth()+1;
+    var d = date.getDate();
+    return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+}
+function myparser(s){
+    if (!s) return new Date();
+    var ss = (s.split('-'));
+    var y = parseInt(ss[0],10);
+    var m = parseInt(ss[1],10);
+    var d = parseInt(ss[2],10);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d)){
+        return new Date(y,m-1,d);
+    } else {
+        return new Date();
+    }
 }

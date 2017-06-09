@@ -13,19 +13,21 @@ class SimulatedShortLineStockHandler(RequestHandler):
     short_line_sell_condition = None
 
     def post(self):
-        security_code = self.get_argument('security_code', None)
-        start_date = '2016-08-11'
-        end_date = '2017-05-23'
-        total_money = 20000
+        security_code = self.get_argument('simulated_security_code', None)
+        start_date = self.get_argument('start_date', None)
+        end_date = self.get_argument('end_date', None)
+        total_money = int(self.get_argument('total_money', 20000))
+        print('security_code', security_code, 'start_date', start_date, 'end_date', end_date)
         position_info = PositionInfo(0, total_money, 0)
         if security_code is not None and start_date is not None and end_date is not None:
             result = self.get_stock_history_quotation(security_code, start_date, end_date)
             result = Utils.tuples_to_dicts(result, self.get_short_line_list_keys())
             result = Utils.append_week_day(result)
             self.combination_condition()
+            # self.print_condition()
             trade_records = self.simulate_stock(total_money, position_info, self.short_line_buy_condition, self.short_line_sell_condition, result)
             result = {"rows": trade_records}
-            result_json = simplejson.dumps(result, default=Utils.json_default)
+            result_json = simplejson.dumps(trade_records, default=Utils.json_default)
             print('simulate_stock result: ', result_json)
             self.write(result_json)
         else:
@@ -36,6 +38,7 @@ class SimulatedShortLineStockHandler(RequestHandler):
             trade_records = []
             status = ''
             dict_status = None
+            pre_the_date = None
             for i in range(len(result)):
                 dict_item = result[i]
                 if(status == '' or status == '卖'):
@@ -45,25 +48,28 @@ class SimulatedShortLineStockHandler(RequestHandler):
                         # 标记已买入
                         status = '买'
                         self.trade_success(position_info, dict_item, status)
-                        self.record_it(trade_records, status, total_money, position_info, dict_item)
+                        self.record_it(trade_records, status, total_money, position_info, dict_item, pre_the_date)
+                        pre_the_date = dict_item['the_date']
                 else:
                     # 当前持仓，则进行卖出可行性搜索匹配
                     trade_flag = self.trade_matching(list_sell_condition, dict_item)
                     if trade_flag:
                         status = '卖'
                         self.trade_success(position_info, dict_item, status)
-                        self.record_it(trade_records, status, total_money, position_info, dict_item)
+                        self.record_it(trade_records, status, total_money, position_info, dict_item, pre_the_date)
+                        pre_the_date = dict_item['the_date']
             return trade_records
         else:
             return None
 
-    def record_it(self, trade_records, status, total_money, position_info, dict_item):
+    def record_it(self, trade_records, status, total_money, position_info, dict_item, pre_the_date):
         earnings = self.calculate_earnings(total_money, position_info)
         dict_item['earnings'] = earnings
         dict_item['status'] = status
         dict_item['position_hands'] = position_info.position_hands
         dict_item['left_money'] = position_info.left_money
         dict_item['total_money'] = position_info.get_total_money()
+        dict_item['diff_days'] = Utils.get_diff_days(pre_the_date, dict_item['the_date'])
         # dict_item['position_info'] = position_info
         trade_records.append(dict_item)
         print(status, dict_item)
@@ -126,8 +132,10 @@ class SimulatedShortLineStockHandler(RequestHandler):
 
     @staticmethod
     def get_target_field_name():
-        field_names = ['money_flow', 'close_chg', 'close_open_chg',
-                       'price_avg_chg', 'price_avg_chg_3', 'price_avg_chg_5']
+        field_names = ['money_flow', 'close_chg', 'close_open_chg', 'close_price_avg_chg',
+                       'close_10_price_avg_chg',
+                       'price_avg_chg', 'price_avg_chg_3', 'price_avg_chg_5',
+                       'price_avg_chg_10', 'price_avg_chg_10_avg']
         return field_names
 
     @staticmethod
@@ -138,22 +146,38 @@ class SimulatedShortLineStockHandler(RequestHandler):
     def combination_condition(self):
         self.short_line_buy_condition = []
         self.short_line_sell_condition = []
-        for i in range(len(self.get_trade_direction())):
-            trade_direction = self.get_trade_direction()[i]
-            for j in range(len(self.get_target_field_name())):
-                field_name = self.get_target_field_name()[j]
-                relation_name = trade_direction + '_' + field_name + '_' + 'relation'
-                relation_value = self.get_argument(relation_name, None)
-                field_value_name = trade_direction + '_' + field_name + '_' + 'field_value'
-                field_value_value = self.get_argument(field_value_name, None)
-                if relation_value is not None and relation_value != '' and field_value_value is not None and field_value_value != '':
-                    if 'buy' == trade_direction:
-                        self.short_line_buy_condition.append(ShortLineCondition(field_name, relation_value, Utils.str_to_decimal(field_value_value, 2)))
-                    elif 'sell' == trade_direction:
-                        self.short_line_sell_condition.append(ShortLineCondition(field_name, relation_value, Utils.str_to_decimal(field_value_value, 2)))
+        buy = 'buy'
+        sell = 'sell'
+        relation = 'relation'
+        field_value = 'field_value'
+        for j in range(len(self.get_target_field_name())):
+            field_name = self.get_target_field_name()[j]
 
+            buy_relation_name = buy + '_' + field_name + '_' + relation
+            buy_relation_value = self.get_argument(buy_relation_name, None)
+            buy_field_value_name = buy + '_' + field_name + '_' + field_value
+            buy_field_value_value = self.get_argument(buy_field_value_name, None)
+            # print(buy_relation_name, buy_relation_value, buy_field_value_name, buy_field_value_value)
+            if buy_relation_value is not None and buy_relation_value != '' and buy_field_value_value is not None and buy_field_value_value != '':
+                self.short_line_buy_condition.append(
+                    ShortLineCondition(field_name, buy_relation_value, Utils.str_to_decimal(buy_field_value_value, 2)))
 
-        # list_condition.append(ShortLineCondition('money_flow', '<', 100))
+            sell_relation_name = sell + '_' + field_name + '_' + relation
+            sell_relation_value = self.get_argument(sell_relation_name, None)
+            sell_field_value_name = sell + '_' + field_name + '_' + field_value
+            sell_field_value_value = self.get_argument(sell_field_value_name, None)
+            # print(sell_relation_name, sell_relation_value, sell_field_value_name, sell_field_value_value)
+            if sell_relation_value is not None and sell_relation_value != '' and sell_field_value_value is not None and sell_field_value_value != '':
+                self.short_line_sell_condition.append(
+                    ShortLineCondition(field_name, sell_relation_value, Utils.str_to_decimal(sell_field_value_value, 2)))
+
+    def print_condition(self):
+        print('买入触发条件')
+        for i in range(len(self.short_line_buy_condition)):
+            print(self.short_line_buy_condition[i].to_string())
+        print('卖出触发条件')
+        for j in range(len(self.short_line_sell_condition)):
+            print(self.short_line_sell_condition[j].to_string())
 
     @staticmethod
     def get_short_line_list_keys():

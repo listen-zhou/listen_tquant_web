@@ -245,3 +245,17 @@ class Utils():
     @staticmethod
     def str_to_decimal(str, n):
         return Utils.base_round(Decimal(str), n)
+
+    @staticmethod
+    def get_diff_days(the_date1, the_date2):
+        if the_date1 is None or the_date2 is None:
+            return 0
+        else:
+            if (isinstance(the_date1, datetime.date) or isinstance(the_date1, datetime.datetime)) \
+                    and (isinstance(the_date2, datetime.date) or isinstance(the_date2, datetime.datetime)):
+                the_date1 = datetime.datetime.now().replace(the_date1.year, the_date1.month, the_date1.day, 0, 0, 0, 0)
+                the_date2 = datetime.datetime.now().replace(the_date2.year, the_date2.month, the_date2.day, 0, 0, 0, 0)
+                diff_days = the_date2 - the_date1
+                return diff_days.days
+            else:
+                return 0
