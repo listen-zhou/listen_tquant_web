@@ -15,23 +15,31 @@ class SimulatedShortLineStockHandler(RequestHandler):
     def post(self):
         security_code = self.get_argument('simulated_security_code', None)
         start_date = self.get_argument('start_date', None)
-        end_date = self.get_argument('end_date', None)
+        end_date = self.get_argument('end_date', Utils.format_yyyy_mm_dd(datetime.datetime.now()))
         total_money = int(self.get_argument('total_money', 20000))
         print('security_code', security_code, 'start_date', start_date, 'end_date', end_date)
         position_info = PositionInfo(0, total_money, 0)
-        if security_code is not None and start_date is not None and end_date is not None:
+        result_dict = {}
+        if security_code is not None \
+                and start_date is not None and start_date != '' \
+                and end_date is not None:
             result = self.get_stock_history_quotation(security_code, start_date, end_date)
             result = Utils.tuples_to_dicts(result, self.get_short_line_list_keys())
             result = Utils.append_week_day(result)
             self.combination_condition()
             # self.print_condition()
             trade_records = self.simulate_stock(total_money, position_info, self.short_line_buy_condition, self.short_line_sell_condition, result)
-            result = {"rows": trade_records}
-            result_json = simplejson.dumps(trade_records, default=Utils.json_default)
+            result_dict['rows'] = trade_records
+            result_dict['status'] = 'success'
+            result_json = simplejson.dumps(result_dict, default=Utils.json_default)
             print('simulate_stock result: ', result_json)
             self.write(result_json)
         else:
-            self.write('no data..')
+            result_dict['status'] = 'faliure'
+            result_dict['message'] = '股票代码或开始时间为空，请先设置'
+            result_json = simplejson.dumps(result_dict, default=Utils.json_default)
+            print('simulate_stock result: ', result_json)
+            self.write(result_json)
 
     def simulate_stock(self, total_money, position_info, list_buy_condition, list_sell_condition, result):
         if result is not None and len(result) > 1:

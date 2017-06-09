@@ -685,7 +685,7 @@ function simulated_short_line_stock(){
         dataType: 'json',
         success: function(data){
             $("#simulated_short_line_stock_grid").datagrid({
-                data: $.parseJSON(data)
+                data: $.parseJSON(data)['rows']
             });
         }
     });
