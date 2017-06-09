@@ -117,6 +117,8 @@ class SimulatedShortLineStockHandler(RequestHandler):
 
 
     def compare(self, value, relation, condition_value):
+        if value is None :
+            return False
         if '=' == relation:
             return value == condition_value
         elif '>' == relation:
