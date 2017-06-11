@@ -677,9 +677,6 @@ function simulated_short_line_stock(){
         $.messager.alert('警告', '请先选择一个股票', 'warning');
         return;
     }
-    $("#simulated_security_code").val(rows[0].security_code);
-    security_code = rows[0].security_code
-    security_name = rows[0].security_name
     $("#simulated_form").form('submit', {
         url: 'simulated_short_line_stock_post',
         dataType: 'json',
@@ -689,17 +686,6 @@ function simulated_short_line_stock(){
             });
         }
     });
-
-    $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
-}
-
-function cellTradeDirection(value,row,index){
-    if(value == '买'){
-        return 'background-color:red; color:gold;';
-    }
-    else{
-        return 'background-color:green; color:gold;';
-    }
 }
 
 function cellTotalMoney(value,row,index){
@@ -728,4 +714,68 @@ function myparser(s){
     } else {
         return new Date();
     }
+}
+
+function cellSimulatedDirectionStyler(value,row,index){
+    if(value == 'buy'){
+        return 'background-color:red; color:gold;';
+    }
+    else{
+        return 'background-color:green; color:gold;';
+    }
+}
+
+function formatSimulatedDirection(val,row){
+    if (val == 'buy'){
+        return '买'
+    }
+    else{
+        return '卖';
+    }
+}
+
+function simulatedStockClick(index, rowData){
+    security_code = rowData.security_code
+    security_name = rowData.security_name
+    $("#simulated_security_code").val(security_code);
+    $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
+    $.ajax({
+        url: '/simulated_short_line_condition_get?simulated_security_code=' + security_code,
+        type: 'get',
+        data: {},
+        dataType: 'json',
+        success: function(data){
+            console.log('查询的条件：');
+            console.log(data);
+            if(data != ''){
+                // dict_data = $.parseJSON(data);
+                dict_data = data;
+                list_buy = dict_data['buy'];
+                list_sell = dict_data['sell'];
+                $.each(list_buy, function(i, obj){
+                    var $id = "#buy_" + obj['field_name'] + '_relation';
+                    $($id).combobox('select', obj['relation']);
+                    console.log($id + ':' + obj['relation']);
+                    $id = "#buy_" + obj['field_name'] + '_field_value'
+                    $($id).numberspinner('setValue', obj['field_value']);
+                    console.log($id + ":" + obj['field_value']);
+                });
+                $.each(list_sell, function(i, obj){
+                    var $id = "#sell_" + obj['field_name'] + '_relation';
+                    $($id).combobox('select', obj['relation']);
+                    console.log($id + ':' + obj['relation']);
+                    $id = "#sell_" + obj['field_name'] + '_field_value'
+                    $($id).numberspinner('setValue', obj['field_value']);
+                    console.log($id + ":" + obj['field_value']);
+                });
+            }
+            else{
+                $.messager.show({
+                    title:'<strong style="color: red;">选择的股票没有设置过条件</strong>',
+                    msg:'<strong style="color: red;">so，赶紧设置一下吧</strong>',
+                    showType:'show'
+                });
+            }
+        }
+    });
 }

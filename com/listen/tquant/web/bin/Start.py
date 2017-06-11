@@ -36,7 +36,8 @@ class App(tornado.web.Application):
             (r'/inflection_point_post', InflectionPointHandler),
             (r'/inflection_point_get', InflectionPointHandler),
             (r'/history_kline_get', InflectionPointKlineHandler),
-            (r'/simulated_short_line_stock_post', SimulatedShortLineStockHandler)
+            (r'/simulated_short_line_stock_post', SimulatedShortLineStockHandler),
+            (r'/simulated_short_line_condition_get', SimulatedShortLineStockHandler),
         ]
 
         print(os.path.dirname(__file__))
