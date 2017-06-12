@@ -739,14 +739,23 @@ function simulatedStockClick(index, rowData){
     security_name = rowData.security_name
     $("#simulated_security_code").val(security_code);
     $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
+    $("#simulated_short_line_stock_grid").datagrid({data: []});
     $.ajax({
         url: '/simulated_short_line_condition_get?simulated_security_code=' + security_code,
         type: 'get',
         data: {},
         dataType: 'json',
+        beforeSend: function(){
+            $.messager.progress({
+                title: '查询中',
+                msg: '正在查询，请稍后...',
+                text: ''
+            });
+        },
+        complete: function(){
+            $.messager.progress('close');
+        },
         success: function(data){
-            console.log('查询的条件：');
-            console.log(data);
             if(data != ''){
                 // dict_data = $.parseJSON(data);
                 dict_data = data;
@@ -755,25 +764,14 @@ function simulatedStockClick(index, rowData){
                 $.each(list_buy, function(i, obj){
                     var $id = "#buy_" + obj['field_name'] + '_relation';
                     $($id).combobox('select', obj['relation']);
-                    console.log($id + ':' + obj['relation']);
                     $id = "#buy_" + obj['field_name'] + '_field_value'
                     $($id).numberspinner('setValue', obj['field_value']);
-                    console.log($id + ":" + obj['field_value']);
                 });
                 $.each(list_sell, function(i, obj){
                     var $id = "#sell_" + obj['field_name'] + '_relation';
                     $($id).combobox('select', obj['relation']);
-                    console.log($id + ':' + obj['relation']);
                     $id = "#sell_" + obj['field_name'] + '_field_value'
                     $($id).numberspinner('setValue', obj['field_value']);
-                    console.log($id + ":" + obj['field_value']);
-                });
-            }
-            else{
-                $.messager.show({
-                    title:'<strong style="color: red;">选择的股票没有设置过条件</strong>',
-                    msg:'<strong style="color: red;">so，赶紧设置一下吧</strong>',
-                    showType:'show'
                 });
             }
         }
