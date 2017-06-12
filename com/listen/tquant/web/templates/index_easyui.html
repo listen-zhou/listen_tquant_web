@@ -49,8 +49,8 @@
 	<div class="easyui-tabs" style="width: 100%; height: 100%; align: center">
 		<div title="分析拐点" id="inflection_point" style="width: 100%; height: 100%;">
 			<div class="easyui-layout" style="width: 98%; height: 100%;">
-				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 12%; height: 100%;">
-					<table class="easyui-datagrid" title="筛选股票"
+				<div id="inflection_stock_codes" data-options="region: 'east', split: true" title="East" style="width: 13%; height: 100%;">
+					<table class="easyui-datagrid" title="筛选股票" style="width: 90%; height: 100%;"
 							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
 							url:'/inflection_point_get', method:'get'">
 						<thead>
@@ -613,13 +613,13 @@
                         </table>
                     </div>
                 </form>
-                <div data-options="region: 'east', split: true" title="East" style="width: 11%;">
+                <div data-options="region: 'east', split: true" title="East" style="width: 12%;">
                     <div id="simulated_tools">
                         <a href="javascript:void(0)" class="easyui-linkbutton" onclick="simulated_short_line_stock()" style="background-color: red; color: gold;">
                             <strong style="background-color: red; color: gold;">选中股票-开始炒股</strong>
                         </a>
                     </div>
-                    <table id="simulated_stocks" class="easyui-datagrid" title="选择短线股票" style="width: 100%; height: 100%;"
+                    <table id="simulated_stocks" class="easyui-datagrid" title="选择短线股票" style="width: 90%; height: 100%;"
 							data-options="remoteSort:false, rownumbers:true, singleSelect:true,
 							url:'/inflection_point_get', method:'get', toolbar:'#simulated_tools', onClickRow: simulatedStockClick">
 						<thead>
