@@ -18,7 +18,7 @@ from com.listen.tquant.web.service.DeviatedChgHandler import DeviatedChgHandler
 from com.listen.tquant.web.service.WorthBuyingHandler import WorthBuyingHandler
 from com.listen.tquant.web.service.InflectionPointHandler import InflectionPointHandler
 from com.listen.tquant.web.service.InflectionPointKlineHandler import InflectionPointKlineHandler
-from com.listen.tquant.web.service.SimulatedShortLineStockHandler import SimulatedShortLineStockHandler
+from com.listen.tquant.web.service.SimulatedShortLineStockHandlerWave import SimulatedShortLineStockHandlerWave
 
 
 define('port', default=8000, help='run on the given port', type=int)
@@ -36,8 +36,7 @@ class App(tornado.web.Application):
             (r'/inflection_point_post', InflectionPointHandler),
             (r'/inflection_point_get', InflectionPointHandler),
             (r'/history_kline_get', InflectionPointKlineHandler),
-            (r'/simulated_short_line_stock_post', SimulatedShortLineStockHandler),
-            (r'/simulated_short_line_condition_get', SimulatedShortLineStockHandler),
+            (r'/simulated_short_line_stock_post', SimulatedShortLineStockHandlerWave),
         ]
 
         print(os.path.dirname(__file__))

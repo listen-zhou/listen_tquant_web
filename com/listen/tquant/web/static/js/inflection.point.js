@@ -1,7 +1,7 @@
 //收盘价涨跌幅背景色处理
 function cellStyler(value,row,index){
     if (value == null){
-        return ''
+        return '';
     }
     else if (value >= 3){
         return 'background-color:red; color:gold;';
@@ -22,7 +22,7 @@ function cellStyler(value,row,index){
 //成交量涨跌幅背景色处理
 function cellVolStyler(value,row,index){
     if (value == null){
-        return ''
+        return '';
     }
     else if (value >= 50){
         return 'background-color:red; color:gold;';
@@ -43,7 +43,7 @@ function cellVolStyler(value,row,index){
 //钱流背景色处理
 function cellMoneyFlowStyler(value,row,index){
     if (value == null){
-        return ''
+        return '';
     }
     else if (value >= 130){
         return 'background-color:red; color:gold;';
@@ -65,7 +65,7 @@ function cellMoneyFlowStyler(value,row,index){
 function cellCloseStyler(value,row,index){
     chg = row['close_chg'];
     if (chg == null){
-        return ''
+        return '';
     }
     if (chg >= 3){
         return 'background-color:red; color:gold;';
@@ -86,7 +86,7 @@ function cellCloseStyler(value,row,index){
 //收盘价/开盘价涨跌幅背景色
 function cellCloseOpenStyler(value,row,index){
     if (value == null){
-        return ''
+        return '';
     }
     else if (value >= 3){
         return 'background-color:red; color:gold;';
@@ -108,7 +108,7 @@ function cellCloseOpenStyler(value,row,index){
 function cellDayAvgPriceStyler(value,row,index){
     chg = row['price_avg_chg'];
     if (chg == null){
-        return ''
+        return '';
     }
     else if (chg >= 3){
         return 'background-color:red; color:gold;';
@@ -130,7 +130,7 @@ function cellDayAvgPriceStyler(value,row,index){
 function cellDayAvgPrice3Styler(value,row,index){
     chg = row['price_avg_chg_3'];
     if (chg == null){
-        return ''
+        return '';
     }
     else if (chg >= 3){
         return 'background-color:red; color:gold;';
@@ -152,7 +152,7 @@ function cellDayAvgPrice3Styler(value,row,index){
 function cellDayAvgPrice5Styler(value,row,index){
     chg = row['price_avg_chg_5'];
     if (chg == null){
-        return ''
+        return '';
     }
     else if (chg >= 3){
         return 'background-color:red; color:gold;';
@@ -174,7 +174,7 @@ function cellDayAvgPrice5Styler(value,row,index){
 function cellDayAvgPrice10Styler(value,row,index){
     chg = row['price_avg_chg_10'];
     if (chg == null){
-        return ''
+        return '';
     }
     else if (chg >= 3){
         return 'background-color:red; color:gold;';
@@ -213,7 +213,7 @@ function cellPercent1Styler(value, row, index){
 //(1,3,5,10)日均涨跌幅背景色
 function cellDayAvgStyler(value,row,index){
     if (value == null){
-        return ''
+        return '';
     }
     else if (value >= 1){
         return 'background-color:red; color:gold;';
@@ -688,11 +688,12 @@ function simulated_short_line_stock(){
     });
 }
 
-function cellTotalMoney(value,row,index){
-    if(value > 20000){
+function cellRelateEarningsDiffMoney(value,row,index){
+    var earnings_diff = row['earnings_diff'];
+    if(earnings_diff > 0){
         return 'background-color:red; color:gold;';
     }
-    else{
+    else if(earnings_diff < 0){
         return 'background-color:green; color:gold;';
     }
 }
@@ -716,15 +717,6 @@ function myparser(s){
     }
 }
 
-function cellSimulatedDirectionStyler(value,row,index){
-    if(value == 'buy'){
-        return 'background-color:red; color:gold;';
-    }
-    else{
-        return 'background-color:green; color:gold;';
-    }
-}
-
 function formatSimulatedDirection(val,row){
     if (val == 'buy'){
         return '买'
@@ -740,40 +732,16 @@ function simulatedStockClick(index, rowData){
     $("#simulated_security_code").val(security_code);
     $("#simulated_stock_info").html("【" + security_code + " " + security_name + "】");
     $("#simulated_short_line_stock_grid").datagrid({data: []});
-    $.ajax({
-        url: '/simulated_short_line_condition_get?simulated_security_code=' + security_code,
-        type: 'get',
-        data: {},
-        dataType: 'json',
-        beforeSend: function(){
-            $.messager.progress({
-                title: '查询中',
-                msg: '正在查询，请稍后...',
-                text: ''
-            });
-        },
-        complete: function(){
-            $.messager.progress('close');
-        },
-        success: function(data){
-            if(data != ''){
-                // dict_data = $.parseJSON(data);
-                dict_data = data;
-                list_buy = dict_data['buy'];
-                list_sell = dict_data['sell'];
-                $.each(list_buy, function(i, obj){
-                    var $id = "#buy_" + obj['field_name'] + '_relation';
-                    $($id).combobox('select', obj['relation']);
-                    $id = "#buy_" + obj['field_name'] + '_field_value'
-                    $($id).numberspinner('setValue', obj['field_value']);
-                });
-                $.each(list_sell, function(i, obj){
-                    var $id = "#sell_" + obj['field_name'] + '_relation';
-                    $($id).combobox('select', obj['relation']);
-                    $id = "#sell_" + obj['field_name'] + '_field_value'
-                    $($id).numberspinner('setValue', obj['field_value']);
-                });
-            }
-        }
-    });
+}
+
+function cellEarningsDiffStyler(value,row,index){
+    if (value == ''){
+        return '';
+    }
+    else if (value > 0){
+        return 'background-color:red; color:gold;';
+    }
+    else if(value < 0){
+        return 'background-color:green; color:gold;';
+    }
 }

@@ -12,7 +12,7 @@ class InflectionPointHandler(RequestHandler):
 
     def post(self):
         security_code = self.get_argument('security_code', None)
-        size = self.get_argument('size', 100)
+        size = self.get_argument('size', 250)
         if security_code is not None:
             result = self.get_stock_day_kline(security_code, size)
             result = Utils.tuples_to_dicts(result, self.get_day_kline_list_keys())
