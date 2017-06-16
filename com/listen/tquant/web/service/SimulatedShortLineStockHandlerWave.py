@@ -20,12 +20,12 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
         total_money = int(self.get_argument('total_money', 20000))
         print('security_code', security_code, 'start_date', start_date, 'end_date', end_date)
         hold_info = {'base_money': total_money,
-                     'hold_hands': 0, 'left_money': total_money, 'earnings': 0,
+                     'hold_hands': 0, 'left_money': total_money,
                      'status': self.sell,
-                     'max_price': None, 'max_the_date': None,
+                     'compare_price': None, 'compare_the_date': None, 'compare_close_open_chg': None,
                      'sell_price': None, 'sell_the_date': None,
-                     'min_price': None, 'min_the_date': None,
-                     'buy_price': None, 'buy_the_date': None}
+                     'buy_price': None, 'buy_the_date': None,
+                     'earnings': 0, 'diff_earnings': None, 'diff_days': None}
         result_dict = {}
         if security_code is not None \
                 and start_date is not None and start_date != '' \
@@ -33,11 +33,11 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             result = self.get_stock_history_quotation(security_code, start_date, end_date)
             result = Utils.tuples_to_dicts(result, self.get_short_line_list_keys())
             result = Utils.append_week_day(result)
-            trade_records = self.simulate_stock(hold_info, result)
+            trade_records = self.simulate_stock(hold_info, result, security_code)
             result_dict['rows'] = trade_records
             result_dict['status'] = 'success'
             result_json = simplejson.dumps(result_dict, default=Utils.json_default)
-            # print('simulate_stock result: ', result_json)
+            print('simulate_stock result: ', result_json)
             self.write(result_json)
         else:
             result_dict['status'] = 'faliure'
@@ -47,15 +47,15 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             self.write(result_json)
 
 
-    def simulate_stock(self, hold_info, result):
+    def simulate_stock(self, hold_info, result, security_code):
         """
         hold_info = {'base_money': total_money,
-                     'hold_hands': 0, 'left_money': total_money, 'earnings': 0,
+                     'hold_hands': 0, 'left_money': total_money,
                      'status': self.sell,
-                     'max_price': None, 'max_the_date': None,
+                     'compare_price': None, 'compare_the_date': None, 'compare_close_open_chg': None,
                      'sell_price': None, 'sell_the_date': None,
-                     'min_price': None, 'min_the_date': None,
-                     'buy_price': None, 'buy_the_date': None}
+                     'buy_price': None, 'buy_the_date': None,
+                     'earnings': 0, 'diff_earnings': None, 'diff_days': None}
         :param hold_info: 
         :param result: 
         :return: 
@@ -72,7 +72,7 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
                         self.record_it(trade_records, hold_info, dict_item)
                 else:
                     # 当前持仓，则进行卖出可行性搜索匹配
-                    trade_flag = self.trade_sell_matching(hold_info, dict_item)
+                    trade_flag = self.trade_sell_matching(hold_info, dict_item, security_code)
                     if trade_flag:
                         self.record_it(trade_records, hold_info, dict_item)
             return trade_records
@@ -82,80 +82,166 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
 
     def trade_buy_matching(self, hold_info, dict_item):
         if dict_item is not None:
+            """
+            买入条件：
+            1.最低价为None时，为第一次寻求买入点
+                遇到的第一个信息标记为等待买入持仓信息，对比价=收盘价，标记柱体颜色，时间，
+            2如果当前持仓信息对比颜色为绿色
+                2.1遇到红柱，即为翻转信号，买入，买入价=收盘价，对比价=收盘价，对比时间，对比颜色
+                2.2遇到绿柱，且收盘价>对比价，即为翻转信号，买入，买入价=收盘价，对比价=收盘价，对比时间，对比颜色
+                2.3遇到绿柱，且收盘价<对比价，则新低信号，更新对比价=收盘价，对比时间，对比颜色
+            3如果当前持仓信息对比颜色为红柱
+                3.1遇到红柱，且收盘价>对比价，则为新高信号，买入，更新买入价=收盘价，对比价=收盘价，对比时间，对比颜色
+                3.2遇到红柱，且收盘价<对比价，则为新低信号，更新对比价=收盘价，对比颜色，对比时间
+                3.3遇到绿柱，且收盘价>对比价，则为见顶信号，不买入，更新对比价=收盘价，对比时间，对比颜色，
+                3.4遇到绿柱，且收盘价<对比价，则为新低信号，不买入，更新对比价=收盘价，对比时间，对比颜色，	
+            hold_info = {'base_money': total_money,
+                     'hold_hands': 0, 'left_money': total_money,
+                     'status': self.sell,
+                     'compare_price': None, 'compare_the_date': None, 'compare_close_open_chg': None,
+                     'sell_price': None, 'sell_the_date': None,
+                     'buy_price': None, 'buy_the_date': None,
+                     'earnings': 0, 'diff_earnings': None, 'diff_days': None}
+            """
             close = dict_item['close']
             the_date = dict_item['the_date']
+            close_open_chg = dict_item['close_open_chg']
             # 现在是空仓待买入
-            min_price = hold_info['min_price']
-            # 如果空仓时最低价为空，则设置第一个遇到的收盘价为最低价
-            if min_price is None:
-                min_price = close
-                hold_info['min_price'] = min_price
-                hold_info['min_the_date'] = the_date
-                print('卖出状态需求买入机会时，遇到第一个，设置为最低信息', 'min_price', min_price, 'min_the_date', hold_info['min_the_date'])
+            compare_price = hold_info['compare_price']
+            # 最低价为None时，为第一次寻求买入点
+            if compare_price is None:
+                hold_info['compare_price'] = close
+                hold_info['compare_the_date'] = the_date
+                hold_info['compare_close_open_chg'] = close_open_chg
+                print('寻求买入点时，对比价为空，则设置遇到的第一个更新为持仓对比信息', 'hold_info', hold_info)
                 return False
             else:
-                # 如果空仓时最低价不为空，则对比遇到的每一个收盘价，
-                # 如果最低价>收盘价，创新低，则更新持仓中的最低价为收盘价
-                close_open_chg = dict_item['close_open_chg']
-                if close_open_chg > 0:
-                    # 如果最低价<收盘价，止跌反弹，见底信号则买入，更新持仓中的买入价
-                    print('最低价止跌翻转，达到买入条件', 'min_price', min_price, 'min_the_date', hold_info['min_the_date'],
-                          'close', close, the_date)
-                    one_hand = 100 * close
-                    hands = int(hold_info['left_money']) // one_hand
-                    spend_money = hands * one_hand
-                    left_money = hold_info['left_money'] - spend_money
-
-                    hold_info['buy_price'] = close
-                    hold_info['buy_the_date'] = the_date
-                    hold_info['hold_hands'] = hands
-                    hold_info['left_money'] = left_money
-                    hold_info['status'] = self.buy
-                    # 买入时设置最高价为当前的收盘价
-                    hold_info['max_price'] = close
-                    hold_info['max_the_date'] = the_date
-                    return True
-                else:
-                    print('最低价创新低，没有达到止跌翻转条件', 'min_price', min_price, 'min_the_date', hold_info['min_the_date'], 'close', close, the_date)
-                    hold_info['min_price'] = close
-                    hold_info['min_the_date'] = the_date
-                    return False
+                # 如果当前持仓信息对比颜色为绿色
+                compare_close_open_chg = hold_info['compare_close_open_chg']
+                if compare_close_open_chg <= 0:
+                    # 遇到红柱，即为翻转信号，买入，买入价=收盘价，对比价=收盘价，对比时间，对比颜色
+                    if (close_open_chg > 0) or (close_open_chg < 0 and close > compare_price):
+                        # 计算买入花费
+                        self.set_buy_hold_info(close, the_date, close_open_chg, hold_info)
+                        return True
+                    # 遇到绿柱，且收盘价<对比价，则新低信号，更新对比价=收盘价，对比时间，对比颜色
+                    elif close_open_chg < 0 and close < compare_price:
+                        # 设置对比信息
+                        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                        return False
+                    else:
+                        print('卖出状态时持仓信息为绿色时，没有匹配到买入条件，尴尬了')
+                        # 设置对比信息
+                        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                        return False
+                # 如果当前持仓信息对比颜色为红柱
+                elif compare_close_open_chg > 0:
+                    # 遇到红柱，且收盘价>对比价，则为新高信号，买入，更新买入价=收盘价，对比价=收盘价，对比时间，对比颜色
+                    if close_open_chg > 0 and close > compare_price:
+                        self.set_buy_hold_info(close, the_date, close_open_chg, hold_info)
+                        return True
+                    # 遇到红柱，且收盘价 < 对比价，则为新低信号，更新对比价 = 收盘价，对比颜色，对比时间
+                    # 遇到绿柱，且收盘价 > 对比价，则为见顶信号，不买入，更新对比价 = 收盘价，对比时间，对
+                    # 遇到绿柱，且收盘价 < 对比价，则为新低信号，不买入，更新对比价 = 收盘价，对比时间，对比颜色，
+                    elif (close_open_chg > 0 and close < compare_price) \
+                            or (close_open_chg < 0 and close > compare_price) \
+                            or (close_open_chg < 0 and close < compare_price):
+                        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                        return False
+                    else:
+                        print('卖出状态时持仓信息为红色时，没有匹配到买入条件，尴尬了')
+                        # 设置对比信息
+                        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                        return False
         else:
             return False
 
-    def trade_sell_matching(self, hold_info, dict_item):
+    def set_buy_hold_info(self, close, the_date, close_open_chg, hold_info):
+        one_hand = 100 * close
+        hands = int(hold_info['left_money']) // one_hand
+        spend_money = hands * one_hand
+        left_money = hold_info['left_money'] - spend_money
+        hold_info['hold_hands'] = hands
+        hold_info['left_money'] = left_money
+        # 设置买入信息
+        hold_info['status'] = self.buy
+        hold_info['buy_price'] = close
+        hold_info['buy_the_date'] = the_date
+        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+
+    def update_compare_info(self, close, the_date, close_open_chg, hold_info):
+        # 设置对比信息
+        hold_info['compare_price'] = close
+        hold_info['compare_the_date'] = the_date
+        hold_info['compare_close_open_chg'] = close_open_chg
+
+    def set_sell_hold_info(self, close, the_date, close_open_chg, hold_info, security_code):
+        sell_money = hold_info['hold_hands'] * 100 * close
+        left_money = hold_info['left_money'] + sell_money
+        hold_info['left_money'] = left_money
+        hold_info['hold_hands'] = 0
+        hold_info['sell_price'] = close
+        hold_info['sell_the_date'] = the_date
+        pre_earnings = hold_info['earnings']
+        earnings = Utils.base_round(Utils.division_zero(left_money - hold_info['base_money'], hold_info['base_money']) * 100, 2)
+        diff_earnings = earnings - pre_earnings
+        hold_info['earnings'] = earnings
+        hold_info['diff_earnings'] = diff_earnings
+        hold_info['diff_days'] = self.get_diff_trade_days(hold_info['buy_the_date'], hold_info['sell_the_date'], security_code)
+        hold_info['status'] = self.sell
+        self.update_compare_info(close, the_date, close_open_chg, hold_info)
+
+    def trade_sell_matching(self, hold_info, dict_item, security_code):
         if dict_item is not None:
+            """
+            卖出条件：
+            1.如果当前持仓信息为红色
+                1.1遇到绿柱，即为翻转新型号，卖出，卖出价=收盘价，期望价=收盘价，时间，标记颜色
+                1.2遇到红柱，且收盘价<买入价，则新低信号，卖出，更新卖出价=收盘价，期望价=收盘价，时间，标记颜色
+                1.3遇到红柱，且收盘价>买入价，则新高信号，继续持有，更新期望价=收盘价，时间，标记颜色
+            2.如果当前持仓信息为率色
+                绿色的持仓暂时没有，先不考虑，等待后续分析加入
+            hold_info = {'base_money': total_money,
+                     'hold_hands': 0, 'left_money': total_money,
+                     'status': self.sell,
+                     'compare_price': None, 'compare_the_date': None, 'compare_close_open_chg': None,
+                     'sell_price': None, 'sell_the_date': None,
+                     'buy_price': None, 'buy_the_date': None,
+                     'earnings': 0, 'diff_earnings': None, 'diff_days': None}
+            """
             close = dict_item['close']
             the_date = dict_item['the_date']
-            # 现在是持仓待卖出
-            max_price = hold_info['max_price']
             close_open_chg = dict_item['close_open_chg']
-            # 最高止盈即逢收盘价<最高价，或者收开幅即收盘价<开盘价，高开低走，即见顶信号，则卖出
-            # 买入价如果小于收盘价，则说明有盈利，且为(绿柱或收盘价<最高价，说明上升通道临时关闭)，应立即卖出，否则继续持有，等待盈利卖出
+            # 现在是持仓待卖出
+            compare_price = hold_info['compare_price']
+            compare_close_open_chg = hold_info['compare_close_open_chg']
             # 当前收益跌幅
             current_rate = Utils.base_round(Utils.division_zero(close - hold_info['buy_price'], hold_info['buy_price']) * 100, 2)
-            if (close_open_chg < 0.3 and (current_rate > 0 or current_rate < -3)) or (close_open_chg <= -3):
-                print('最高价止盈翻转，或收开幅小于0变绿柱，达到卖出条件',
-                      'buy_price', hold_info['buy_price'], 'buy_the_date', hold_info['buy_the_date'],
-                      'max_price', hold_info['max_price'], 'max_the_date', hold_info['max_the_date'],
-                      'close', close, the_date, 'close_open_chg', close_open_chg)
-                sell_money = hold_info['hold_hands'] * 100 * close
-                left_money = hold_info['left_money'] + sell_money
-                hold_info['left_money'] = left_money
-                hold_info['hold_hands'] = 0
-                hold_info['sell_price'] = close
-                hold_info['sell_the_date'] = the_date
-                hold_info['status'] = self.sell
-                # 卖出时设置最低价为卖出价
-                hold_info['min_price'] = close
-                hold_info['min_the_date'] = the_date
-                return True
+            # 如果当前持仓信息为红色
+            if compare_close_open_chg > 0:
+                # 遇到绿柱，即为翻转新型号，卖出，卖出价=收盘价，期望价=收盘价，时间，标记颜色
+                if close_open_chg <= 0:
+                    self.set_sell_hold_info(close, the_date, close_open_chg, hold_info, security_code)
+                    return True
+                # 遇到红柱，且收盘价<期望价，则新低信号，卖出，更新卖出价=收盘价，期望价=收盘价，时间，标记颜色
+                elif close_open_chg > 0 and close < compare_price:
+                    self.set_sell_hold_info(close, the_date, close_open_chg, hold_info, security_code)
+                    return True
+                # 遇到红柱，且收盘价>买入价，则新高信号，继续持有，更新期望价=收盘价，时间，标记颜色
+                elif close_open_chg > 0 and close > compare_price:
+                    # 设置对比信息
+                    self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                    return False
+                else:
+                    print('买入状态时持仓信息为红色时，没有匹配到卖出条件，尴尬了')
+                    # 设置对比信息
+                    self.update_compare_info(close, the_date, close_open_chg, hold_info)
+                    return False
+            # 如果当前持仓信息为绿色
             else:
                 # 创新高，则更新最高价信息
-                print('最高价创新高，没有达到止盈翻转条件', 'max_price', hold_info['max_price'], 'max_the_date', hold_info['max_the_date'],
-                      'close', close, the_date)
-                hold_info['max_price'] = close
-                hold_info['max_the_date'] = the_date
+                # 设置对比信息
+                self.update_compare_info(close, the_date, close_open_chg, hold_info)
                 return False
         else:
             return False
@@ -165,23 +251,14 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
     def record_it(self, trade_records, hold_info, dict_item):
         # 如果是卖出成交，则计算收益率，买入则不计算
         if hold_info['status'] == self.sell:
-            earnings = Utils.base_round(
-                Utils.division_zero(hold_info['left_money'] - hold_info['base_money'], hold_info['base_money']) * 100,
-                2)
-            dict_item['earnings'] = earnings
+            dict_item['earnings'] = hold_info['earnings']
             dict_item['total_money'] = hold_info['left_money']
-            dict_item['diff_days'] = Utils.get_diff_days(hold_info['buy_the_date'], hold_info['sell_the_date'])
-            pre_index = len(trade_records) - 2
-            pre_earnings = 0
-            earnings_diff = 0
-            if pre_index >= 0:
-                pre_earnings = trade_records[pre_index]['earnings']
-            earnings_diff = dict_item['earnings'] - pre_earnings
-            dict_item['earnings_diff'] = earnings_diff
+            dict_item['diff_days'] = hold_info['diff_days']
+            dict_item['diff_earnings'] = hold_info['diff_earnings']
         else:
             dict_item['hold_hands'] = hold_info['hold_hands']
             dict_item['total_money'] = hold_info['left_money'] + hold_info['hold_hands'] * 100 * hold_info['buy_price']
-            dict_item['diff_days'] = Utils.get_diff_days(hold_info['sell_the_date'], hold_info['buy_the_date'])
+            # dict_item['diff_days'] = Utils.get_diff_days(hold_info['sell_the_date'], hold_info['buy_the_date'])
         dict_item['status'] = hold_info['status']
         trade_records.append(dict_item)
 

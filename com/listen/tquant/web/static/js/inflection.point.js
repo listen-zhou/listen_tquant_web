@@ -689,11 +689,11 @@ function simulated_short_line_stock(){
 }
 
 function cellRelateEarningsDiffMoney(value,row,index){
-    var earnings_diff = row['earnings_diff'];
-    if(earnings_diff > 0){
+    var diff_earnings = row['diff_earnings'];
+    if(diff_earnings > 0){
         return 'background-color:red; color:gold;';
     }
-    else if(earnings_diff < 0){
+    else if(diff_earnings < 0){
         return 'background-color:green; color:gold;';
     }
 }
