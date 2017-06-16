@@ -212,15 +212,18 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             close = dict_item['close']
             the_date = dict_item['the_date']
             close_open_chg = dict_item['close_open_chg']
+            vol = dict_item['vol']
             # 现在是持仓待卖出
             compare_price = hold_info['compare_price']
             compare_close_open_chg = hold_info['compare_close_open_chg']
             # 当前收益跌幅
             current_rate = Utils.base_round(Utils.division_zero(close - hold_info['buy_price'], hold_info['buy_price']) * 100, 2)
+            # 当前成交量幅度
+            # current_vol_chg =
             # 如果当前持仓信息为红色
             if compare_close_open_chg > 0:
                 # 遇到绿柱，即为翻转新型号，卖出，卖出价=收盘价，期望价=收盘价，时间，标记颜色
-                if close_open_chg <= 0:
+                if close_open_chg <= 0 and current_rate > 0:
                     self.set_sell_hold_info(close, the_date, close_open_chg, hold_info, security_code)
                     return True
                 # 遇到红柱，且收盘价<期望价，则新低信号，卖出，更新卖出价=收盘价，期望价=收盘价，时间，标记颜色
