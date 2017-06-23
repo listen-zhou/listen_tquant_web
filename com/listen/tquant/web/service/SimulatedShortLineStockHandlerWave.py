@@ -95,9 +95,14 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             # 如果现在是空仓待买入
             if hold_info['status'] == self.sell:
                 # 买入条件：收幅>=0，日均幅-升，即当前的日均幅小于后一天的日均幅，无论红绿颜色
-                if current_price_avg_chg is not None \
-                        and close_chg >= 0 and current_price_avg_chg < price_avg_chg \
-                        and close_open_chg >= 0:
+                if current_price_avg_chg is not None and close_open_chg >= 0 and close_chg >= 0 \
+                        and current_price_avg_chg < price_avg_chg:
+                    buy_sell_reason = "实时收幅[{close_chg} >= 0]; 实时收开幅[{close_open_chg} >= 0]; " \
+                                      "持仓日均幅[{current_price_avg_chg} < {price_avg_chg}]实时日均幅"
+                    buy_sell_reason = buy_sell_reason.format(close_chg=close_chg, close_open_chg=close_open_chg,
+                                                             current_price_avg_chg=current_price_avg_chg, price_avg_chg=price_avg_chg)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
                     # 遇到红柱，即为翻转信号，买入，买入价=收盘价，对比价=收盘价，对比时间，对比颜色
                     self.set_buy_hold_info(close, the_date, price_avg_chg, hold_info)
                     return True
@@ -115,9 +120,49 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
                 # 在下跌时，判断可以承受的割肉率，是否在可承受的范围内
                 current_earnings = Utils.base_round(Utils.division_zero(close - buy_price, buy_price) * 100, 2)
                 # 卖出条件：收幅 < 0， 日均幅 - 降，即当前日均幅大于后一天的日均幅，无论红绿颜色
-                if (current_price_avg_chg is not None
-                    and close_chg < 0 and current_price_avg_chg >= price_avg_chg and current_earnings > 0) \
-                        or (close_open_chg <= 0 and current_earnings >= 0) or current_earnings <= -5 or fall_times >= 3:
+                if current_price_avg_chg is not None and close_chg < 0 and current_earnings > 0 and current_price_avg_chg >= price_avg_chg:
+                    buy_sell_reason = "实时收幅[{close_chg} < 0]; " \
+                                  "实时涨跌幅[{current_earnings} > 0]; " \
+                                  "持仓日均幅[{current_price_avg_chg} >= {price_avg_chg}]实时日均幅"
+                    buy_sell_reason = buy_sell_reason.format(close_chg=close_chg, current_earnings=current_earnings,
+                                                     current_price_avg_chg=current_price_avg_chg, price_avg_chg=price_avg_chg)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif close_open_chg <= -1:
+                    buy_sell_reason = "实时收开幅[{close_open_chg} <= -1]"
+                    buy_sell_reason = buy_sell_reason.format(close_open_chg=close_open_chg, current_earnings=current_earnings)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif current_earnings <= -5:
+                    buy_sell_reason = "实时涨跌幅[{current_earnings} <= -5]"
+                    buy_sell_reason = buy_sell_reason.format(current_earnings=current_earnings)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif fall_times >= 2:
+                    buy_sell_reason = "实时收盘价连续低于买入价[{fall_times}]次"
+                    buy_sell_reason = buy_sell_reason.format(fall_times=fall_times)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif close_open_chg > 0 and close < buy_price:
+                    buy_sell_reason = "实时收开幅[{close_open_chg} < 0]; 实时收盘价[{close} < {buy_price}]买入价"
+                    buy_sell_reason = buy_sell_reason.format(close_open_chg=close_open_chg, close=close, buy_price=buy_price)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif close_open_chg < -2.4:
+                    buy_sell_reason = "实时收开幅[{close_open_chg} < -2.4]"
+                    buy_sell_reason = buy_sell_reason.format(close_open_chg=close_open_chg)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
                     self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
                     return True
                 else:
@@ -158,6 +203,7 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
         hold_info['diff_days'] = self.get_diff_trade_days(hold_info['buy_the_date'], hold_info['sell_the_date'], security_code)
         hold_info['status'] = self.sell
         hold_info['current_price_avg_chg'] = price_avg_chg
+        hold_info['hold_earnings'] = Utils.base_round(Utils.division_zero(left_money - hold_info['base_money'], hold_info['base_money']) * 100, 2)
 
 
     def record_it(self, trade_records, hold_info, dict_item):
@@ -167,11 +213,13 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             dict_item['total_money'] = hold_info['left_money']
             dict_item['diff_days'] = hold_info['diff_days']
             dict_item['diff_earnings'] = hold_info['diff_earnings']
+            dict_item['hold_earnings'] = hold_info['hold_earnings']
         else:
             dict_item['hold_hands'] = hold_info['hold_hands']
             dict_item['total_money'] = hold_info['left_money'] + hold_info['hold_hands'] * 100 * hold_info['buy_price']
             # dict_item['diff_days'] = Utils.get_diff_days(hold_info['sell_the_date'], hold_info['buy_the_date'])
         dict_item['status'] = hold_info['status']
+        dict_item['buy_sell_reason'] = hold_info['buy_sell_reason']
         trade_records.append(dict_item)
 
     def get_diff_trade_days(self, the_date1, the_date2, security_code):
