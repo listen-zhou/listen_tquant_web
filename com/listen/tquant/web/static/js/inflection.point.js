@@ -306,6 +306,7 @@ function inflection_point_grid_query(){
         });
         return;
     }
+
     $("#inflection_point_grid").datagrid({
         queryParams: {
             security_code: security_code,

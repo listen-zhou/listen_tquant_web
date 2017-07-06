@@ -18,14 +18,14 @@ class InflectionPointHandler(RequestHandler):
             result = Utils.tuples_to_dicts(result, Utils.get_day_kline_list_keys())
             print('result', result)
             if result is None or len(result) == 0:
-                self.write("search no data !!!")
+                self.write('[]')
             else:
                 result = {"rows": result}
                 result_json = simplejson.dumps(result, default=Utils.json_default)
                 print('get_stock_day_kline result: ', result_json)
                 self.write(result_json)
         else:
-            self.write("no security_code !!!")
+            self.write('[]')
 
     def get_all_stock_info(self):
         sql = "select security_code, security_name " \
