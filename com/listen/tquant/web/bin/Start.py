@@ -11,11 +11,7 @@ import sys
 
 from tornado.options import define, options
 
-from com.listen.tquant.web.service.CheckStockIsWrothBuyingHandler import CheckStockIsWrothBuyingHandler
 from com.listen.tquant.web.service.IndexHandler import IndexHandler
-from com.listen.tquant.web.service.DeviatedChgHandler import DeviatedChgHandler
-
-from com.listen.tquant.web.service.WorthBuyingHandler import WorthBuyingHandler
 from com.listen.tquant.web.service.InflectionPointHandler import InflectionPointHandler
 from com.listen.tquant.web.service.InflectionPointKlineHandler import InflectionPointKlineHandler
 from com.listen.tquant.web.service.SimulatedShortLineStockHandlerWave import SimulatedShortLineStockHandlerWave
@@ -27,12 +23,6 @@ class App(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r'/', IndexHandler),
-            (r'/average_line', CheckStockIsWrothBuyingHandler),
-            (r'/worth_buying', CheckStockIsWrothBuyingHandler),
-            (r'/worth_buying_put', CheckStockIsWrothBuyingHandler),
-            (r'/deviated_chg_get', DeviatedChgHandler),
-            (r'/worth_buying_post', WorthBuyingHandler),
-            (r'/worth_buying_get', WorthBuyingHandler),
             (r'/inflection_point_post', InflectionPointHandler),
             (r'/inflection_point_get', InflectionPointHandler),
             (r'/history_kline_get', InflectionPointKlineHandler),

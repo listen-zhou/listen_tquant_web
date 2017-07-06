@@ -88,35 +88,41 @@
                             </tr>
                         </thead>
                         <thead>
-                        <tr>
+                            <tr>
+                            <!--
 								<th data-options="field:'open', align:'center'">开</th>
 								<th data-options="field:'high', align:'center'">高</th>
 								<th data-options="field:'low', align:'center'">低</th>
-								<th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
-								<th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
-								<th data-options="field:'close_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/日均幅</th>
-								<th data-options="field:'close_10_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
+                            -->
+                                <th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
+                                <th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
 								<th data-options="field:'close_open_chg', align:'center', styler:cellCloseOpenStyler, formatter:formatPercent">收/开幅</th>
 
 								<th data-options="field:'vol', align:'center'">量(股)</th>
 								<th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量幅</b></th>
 								<th data-options="field:'amount', align:'center'">额(元)</th>
-								<th data-options="field:'money_flow', align:'center', styler:cellMoneyFlowStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">钱流</b></th>
+								<th data-options="field:'amount_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">额幅</b></th>
 
-								<th data-options="field:'price_avg', align:'center', styler:cellDayAvgPriceStyler">日均</th>
-								<th data-options="field:'price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">日均幅</b></th>
+								<th data-options="field:'price_avg_1', align:'center', styler:cellDayAvgPriceStyler">1均</th>
+								<th data-options="field:'price_avg_1_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">1均幅</b></th>
+                                <th data-options="field:'close_price_avg_1_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/1均幅</th>
+                                <th data-options="field:'price_avg_1_chg_diff', align:'center', formatter:formatImg">连续</th>
 
 								<th data-options="field:'price_avg_3', align:'center', styler:cellDayAvgPrice3Styler">3均</th>
-								<th data-options="field:'price_avg_chg_3', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+								<th data-options="field:'price_avg_3_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">3均幅</th>
+                                <th data-options="field:'close_price_avg_3_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/3均幅</th>
+                                <th data-options="field:'price_avg_3_chg_diff', align:'center', formatter:formatImg">连续</th>
 
 								<th data-options="field:'price_avg_5', align:'center', styler:cellDayAvgPrice5Styler">5均</th>
-								<th data-options="field:'price_avg_chg_5', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+								<th data-options="field:'price_avg_5_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">5均幅</th>
+                                <th data-options="field:'close_price_avg_5_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/5均幅</th>
+                                <th data-options="field:'price_avg_5_chg_diff', align:'center', formatter:formatImg">连续</th>
 
 								<th data-options="field:'price_avg_10', align:'center', styler:cellDayAvgPrice10Styler">10均</th>
-								<th data-options="field:'price_avg_chg_10', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">均幅</th>
+								<th data-options="field:'price_avg_10_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">10均幅</th>
+                                <th data-options="field:'close_price_avg_10_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
+                                <th data-options="field:'price_avg_10_chg_diff', align:'center', formatter:formatImg">连续</th>
 
-								<th data-options="field:'price_avg_chg_10_avg', align:'center', styler:cellPercent1Styler, formatter:formatPercent"><b style="color: red; background-color: gold;">10均幅均</b></th>
-								<th data-options="field:'price_avg_chg_10_avg_diff', align:'center', formatter:formatImg">连续</th>
                                 <th data-options="field:'week_day', align:'center'">周几</th>
 							</tr>
 						</thead>
@@ -187,43 +193,29 @@
                                 -->
                                 <th data-options="field:'close', align:'center', styler:cellCloseStyler">收</th>
                                 <th data-options="field:'close_chg', align:'center', styler:cellStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">收-幅</b></th>
-                                <th data-options="field:'close_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/日均幅</th>
-                                <th data-options="field:'close_10_price_avg_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
-                                <th data-options="field:'close_open_chg', align:'center', styler:cellCloseOpenStyler, formatter:formatPercent">收/开幅</th>
+								<th data-options="field:'close_open_chg', align:'center', styler:cellCloseOpenStyler, formatter:formatPercent">收/开幅</th>
 
-                                <!--
-                                <th data-options="field:'vol', align:'center'">量(股)</th>
-                                -->
-                                <th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量幅</b></th>
-                                <!--
-                                <th data-options="field:'amount', align:'center'">额(元)</th>
-                                -->
-                                <th data-options="field:'money_flow', align:'center', styler:cellMoneyFlowStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">钱流</b></th>
+								<th data-options="field:'vol', align:'center'">量(股)</th>
+								<th data-options="field:'vol_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">量幅</b></th>
+								<th data-options="field:'amount', align:'center'">额(元)</th>
+								<th data-options="field:'amount_chg', align:'center', styler:cellVolStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">额幅</b></th>
 
-                                <!--
-                                <th data-options="field:'price_avg', align:'center', styler:cellDayAvgPriceStyler">日均</th>
-                                -->
-                                <th data-options="field:'price_avg_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">日均幅</b></th>
+								<th data-options="field:'price_avg_1', align:'center', styler:cellDayAvgPriceStyler">1均</th>
+								<th data-options="field:'price_avg_1_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent"><b style="color: red; background-color: gold;">1均幅</b></th>
+                                <th data-options="field:'close_price_avg_1_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/1均幅</th>
 
-                                <!--
-                                <th data-options="field:'price_avg_3', align:'center', styler:cellDayAvgPrice3Styler">3均</th>
-                                -->
-                                <th data-options="field:'price_avg_chg_3', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">3均幅</th>
+								<th data-options="field:'price_avg_3', align:'center', styler:cellDayAvgPrice3Styler">3均</th>
+								<th data-options="field:'price_avg_3_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">3均幅</th>
+                                <th data-options="field:'close_price_avg_3_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/3均幅</th>
 
-                                <!--
-                                <th data-options="field:'price_avg_5', align:'center', styler:cellDayAvgPrice5Styler">5均</th>
-                                -->
-                                <th data-options="field:'price_avg_chg_5', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">5均幅</th>
+								<th data-options="field:'price_avg_5', align:'center', styler:cellDayAvgPrice5Styler">5均</th>
+								<th data-options="field:'price_avg_5_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">5均幅</th>
+                                <th data-options="field:'close_price_avg_5_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/5均幅</th>
 
-                                <!--
-                                <th data-options="field:'price_avg_10', align:'center', styler:cellDayAvgPrice10Styler">10均</th>
-                                -->
-                                <th data-options="field:'price_avg_chg_10', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">10均幅</th>
+								<th data-options="field:'price_avg_10', align:'center', styler:cellDayAvgPrice10Styler">10均</th>
+								<th data-options="field:'price_avg_10_chg', align:'center', styler:cellDayAvgStyler, formatter:formatPercent">10均幅</th>
+                                <th data-options="field:'close_price_avg_10_chg', align:'center', styler:cellStyler, formatter:formatPercent">收/10均幅</th>
 
-                                <th data-options="field:'price_avg_chg_10_avg', align:'center', styler:cellPercent1Styler, formatter:formatPercent"><b style="color: red; background-color: gold;">10均幅均</b></th>
-                                <!--
-                                <th data-options="field:'price_avg_chg_10_avg_diff', align:'center', formatter:formatImg">连续</th>
-                                -->
                                 <th data-options="field:'week_day', align:'center'">周几</th>
 
                                 <th data-options="field:'status', align:'center', styler:cellRelateEarningsDiffMoney, formatter:formatSimulatedDirection">买卖</th>

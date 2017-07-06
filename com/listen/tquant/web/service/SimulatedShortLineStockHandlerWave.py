@@ -31,8 +31,7 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
                 and start_date is not None and start_date != '' \
                 and end_date is not None:
             result = self.get_stock_history_quotation(security_code, start_date, end_date)
-            result = Utils.tuples_to_dicts(result, self.get_short_line_list_keys())
-            result = Utils.append_week_day(result)
+            result = Utils.tuples_to_dicts(result, Utils.get_day_kline_list_keys())
             trade_records = self.simulate_stock(hold_info, result, security_code)
             result_dict['rows'] = trade_records
             result_dict['status'] = 'success'
@@ -89,7 +88,7 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             the_date = dict_item['the_date']
             close_chg = dict_item['close_chg']
             close_open_chg = dict_item['close_open_chg']
-            price_avg_chg = dict_item['price_avg_chg']
+            price_avg_chg = dict_item['price_avg_1_chg']
 
             current_price_avg_chg = hold_info['current_price_avg_chg']
             # 如果现在是空仓待买入
@@ -126,6 +125,14 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
                                   "持仓日均幅[{current_price_avg_chg} >= {price_avg_chg}]实时日均幅"
                     buy_sell_reason = buy_sell_reason.format(close_chg=close_chg, current_earnings=current_earnings,
                                                      current_price_avg_chg=current_price_avg_chg, price_avg_chg=price_avg_chg)
+                    print(buy_sell_reason)
+                    hold_info['buy_sell_reason'] = buy_sell_reason
+                    self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
+                    return True
+                elif close_open_chg <= 0 and buy_price < close:
+                    buy_sell_reason = "实时收幅[{close_chg} < 0]; " \
+                                      "买入价[{buy_price} < {close}]实时收盘价; "
+                    buy_sell_reason = buy_sell_reason.format(close_chg=close_chg, buy_price=buy_price, close=close)
                     print(buy_sell_reason)
                     hold_info['buy_sell_reason'] = buy_sell_reason
                     self.set_sell_hold_info(close, the_date, price_avg_chg, hold_info, security_code)
@@ -242,51 +249,19 @@ class SimulatedShortLineStockHandlerWave(RequestHandler):
             else:
                 return 0
 
-
-    @staticmethod
-    def get_target_field_name():
-        field_names = ['money_flow', 'close_chg', 'close_open_chg', 'close_price_avg_chg',
-                       'close_10_price_avg_chg',
-                       'price_avg_chg', 'price_avg_chg_3', 'price_avg_chg_5',
-                       'price_avg_chg_10', 'price_avg_chg_10_avg']
-        return field_names
-
-    @staticmethod
-    def get_short_line_list_keys():
-        list_keys = ['the_date',
-                     'open', 'high', 'low',
-                     'close',
-                     'vol_chg', 'close_chg', 'close_open_chg', 'close_price_avg_chg',
-                     'price_avg_chg',
-                     'price_avg_chg_3',
-                     'price_avg_chg_5',
-                     'price_avg_chg_10', 'close_10_price_avg_chg',
-                     'price_avg_chg_10_avg', 'price_avg_chg_10_avg_diff',
-                     'money_flow',
-                     'vol', 'amount', 'price_avg', 'price_avg_3', 'price_avg_5', 'price_avg_10']
-        return list_keys
-
     def get_stock_history_quotation(self, security_code, start_date, end_date):
         if security_code is not None and start_date is not None:
             if end_date is None or end_date == '':
                 today = datetime.datetime.today()
                 end_date = str(today.year) + '-' + str(today.month) + '-' + str(today.day)
-            sql = "select the_date, " \
-                  "open, high, low, " \
-                  "close, " \
-                  "vol_chg, " \
-                  "close_chg, close_open_chg, close_price_avg_chg, " \
-                  "price_avg_chg, " \
-                  "price_avg_chg_3, " \
-                  "price_avg_chg_5, " \
-                  "price_avg_chg_10, close_10_price_avg_chg, " \
-                  "price_avg_chg_10_avg, price_avg_chg_10_avg_diff, " \
-                  "money_flow, " \
-                  "vol, amount, price_avg, price_avg_3, price_avg_5, price_avg_10 " \
-                  "from tquant_stock_history_quotation " \
-                  "where security_code = {security_code} " \
-                  "and the_date >= {start_date} and the_date <= {end_date} " \
-                  "order by the_date asc "
+            sql = "select "
+            for field_name in Utils.get_day_kline_list_keys():
+                sql += " " + field_name + ","
+            sql = sql[0:len(sql) - 1]
+            sql += " from tquant_stock_history_quotation " \
+                   "where security_code = {security_code} " \
+                   "and the_date >= {start_date} and the_date <= {end_date} " \
+                   "order by the_date asc "
             sql = sql.format(security_code=Utils.quotes_surround(security_code),
                              start_date=Utils.quotes_surround(start_date),
                              end_date=Utils.quotes_surround(end_date)

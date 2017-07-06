@@ -313,7 +313,7 @@ function inflection_point_grid_query(){
         }
     });
     $("#interval_time").html(new Date().toLocaleString());
-    get_stock_history_kline(security_code, size);
+//    get_stock_history_kline(security_code, size);
 }
 //查询全部股票列表
 function query_all_stockinfo(){

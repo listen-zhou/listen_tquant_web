@@ -259,3 +259,16 @@ class Utils():
                 return diff_days.days
             else:
                 return 0
+
+    @staticmethod
+    def get_day_kline_list_keys():
+        list_keys = ['the_date', 'week_day',
+                     'close', 'close_chg', 'close_open_chg',
+                     'open', 'open_chg', 'high', 'high_chg', 'low', 'low_chg',
+                     'amount', 'amount_chg', 'vol', 'vol_chg',
+                     'price_avg_1', 'price_avg_1_chg', 'price_avg_1_chg_diff', 'close_price_avg_1_chg',
+                     'price_avg_3', 'price_avg_3_chg', 'price_avg_3_chg_diff', 'close_price_avg_3_chg',
+                     'price_avg_5', 'price_avg_5_chg', 'price_avg_5_chg_diff', 'close_price_avg_5_chg',
+                     'price_avg_10', 'price_avg_10_chg', 'price_avg_10_chg_diff', 'close_price_avg_10_chg'
+                     ]
+        return list_keys
